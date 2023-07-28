@@ -3,7 +3,7 @@
 
 # TODO: move to global ENV variable or read from GH client
 
-GH_USERNAME=$(gh auth status | grep -oP '(?<=Logged in to github.com as ).*(?= \()')
+GH_USERNAME=$(gh auth status | awk '/Logged in to github.com as/{sub(/.*as /,"",$0); print $0}' | awk '{print $1}')
 
 if ! command -v gh > /dev/null 2>&1; then
     echo "gh client not present! please install."
@@ -14,7 +14,7 @@ REPO_NAME=$(basename "$current_dir")
 
 # Check if repo already exists
 REPO_EXISTS=1
-if [[ -z $(gh repo list | grep "'^$GH_USERNAME/$REPO_NAME\s'") ]]; then
+if [[ -z $(gh repo list | grep "^$GH_USERNAME/$REPO_NAME") ]]; then
 	REPO_EXISTS=0
 fi
 
