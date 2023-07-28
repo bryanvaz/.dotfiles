@@ -7,5 +7,4 @@ awesome if you mentioned where you got it from .
 If you like what you see and want support my work, consider sponsoring me by
 clicking the heart button above.
 
-Cheers,
-Bryan
+Cheers 🍻

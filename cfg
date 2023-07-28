@@ -128,9 +128,11 @@ if [ "$ACTION" == "install" ]; then
     # TODO: Implement install functionality
     echo "Installing packages..."
 
-    # TODO: instal zsh, zsh theme, neovim, python3, nvm, kitty, fonts, docker, docker-compose, golang, build-essential, lolcat
+    # TODO: instal zsh, zsh theme, neovim, python3
     
-    # TODO: install for mac iterm2, fonts, nexcloud, vscode-insiders
+    # TODO: install for linux dev servers: fonts, nextcloud, nvm, gh, docker, docker-compose, golang, build-essential, lolcat
+    # TODO: install for linux desktops: kitty, fonts, nextcloud, vscode-insiders, nvm, gh, docker, docker-compose, golang, build-essential, lolcat
+    # TODO: install for mac iterm2, fonts, nexcloud, vscode-insiders, nvm, gh, docker, docker-compose, golang, build-essential, lolcat
     
 fi
 
