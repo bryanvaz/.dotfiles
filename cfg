@@ -1,0 +1,165 @@
+#!/bin/bash
+CONFIG_HOME="${HOME}/.config/"
+# NVIM_HOME="${CONFIG_HOME}/nvim/"
+
+# Get the current location of this bash script
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+CONFIG_BACKUP="${DIR}/config/"
+ZSH_BACKUP="${DIR}/zsh/"
+AWS_BACKUP="${DIR}/aws/"
+GIT_BACKUP="${DIR}/git/"
+LOCAL_BACKUP="${DIR}/local"
+
+ACTION=$1
+
+# Determine the operating system (either `linux` or `darwin` or `windows`)
+OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+
+# List of linux packages to install
+APT_PACKAGES=(
+    git
+)
+
+# List of mac packages to install
+HOMEBREW_PACKAGES=(
+    git
+)
+
+# List of directories to be stashed
+CONFIG_BACKUP_DIRS=(
+    nvim
+    gh
+)
+
+function ensure_prerequisites() {
+    # Check if git is installed
+    if ! [ -x "$(command -v git)" ]; then
+        echo "Git not installed! Installing git ..." >&2
+        install_git
+    fi
+
+    if [ "$OS" == "darwin" ]; then
+        ensure_mac_prequisites
+    elif [ "$OS" == "windows" ]; then
+        ensure_windows_prequisites
+    fi
+}
+
+function ensure_mac_prequisites() {
+    # Check if brew is installed
+    if ! [ -x "$(command -v brew)" ]; then
+        echo "Homebrew not installed! Installing homebrew ..." >&2
+        exit 1
+    fi
+}
+function ensure_windows_prequisites() {
+    # Check if choco is installed
+    if ! [ -x "$(command -v choco)" ]; then
+        echo "Chocolatey not installed! Installing chocolatey ..." >&2
+        install_choco
+    fi
+}
+
+function install_git() {
+    # Install git
+    if [ "$OS" == "linux" ]; then
+        sudo apt-get install git
+    elif [ "$OS" == "darwin" ]; then
+        xcode-select --install
+    elif [ "$OS" == "windows" ]; then
+        choco install git
+    fi
+}
+
+# Only run on macOS
+function install_homebrew() {
+    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    
+}
+
+function install_choco() {
+    powershell -Command "Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"
+}
+
+# Exec starts here
+
+# run ensure_prerequisites
+ensure_prerequisites
+
+
+if [ "$ACTION" == "stash" ]; then
+    # Loop through CONFIG_BACKUP_DIRS and backup each directory
+    for config_backup_dir in "${CONFIG_BACKUP_DIRS[@]}"; do
+        if [ -d "${CONFIG_HOME}/${config_backup_dir}" ]; then
+            echo "Backing up ${config_backup_dir} config..."
+            mkdir -p "${CONFIG_BACKUP}/${config_backup_dir}"
+            cp -r "${CONFIG_HOME}/${config_backup_dir}/" "${CONFIG_BACKUP}/${config_backup_dir}/"
+        fi
+    done
+
+    # Backup zsh
+    echo "Backing up zsh config..."
+    mkdir -p "${ZSH_BACKUP}"
+    cp -r "${HOME}/.zshrc" "${ZSH_BACKUP}/.zshrc"
+    cp -r "${HOME}/.zsh_profile" "${ZSH_BACKUP}/.zsh_profile"
+    cp -r "${HOME}/.zprofile" "${ZSH_BACKUP}/.zprofile"
+
+    # Backup banner
+    echo "Backing up banner..."
+    cp -r "${HOME}/.banner" "${DIR}/.banner"
+
+    # Backup aws config
+    echo "Backing up aws config..."
+    mkdir -p "${AWS_BACKUP}"
+    cp -r "${HOME}/.aws/config" "${AWS_BACKUP}/config"
+
+    # Backup git config
+    echo "Backing up git config..."
+    mkdir -p "${GIT_BACKUP}"
+    cp -r "${HOME}/.gitconfig" "${GIT_BACKUP}/.gitconfig"
+
+    # backup scritps
+    echo "Backing up scripts..."
+    mkdir -p "${LOCAL_BACKUP}/scripts"
+    cp -r "${HOME}/.local/scripts/" "${LOCAL_BACKUP}/scripts/"
+fi
+
+if [ "$ACTION" == "install" ]; then
+    # TODO: Implement install functionality
+    echo "Installing packages..."
+
+    # TODO: instal zsh, zsh theme, neovim, python3, nvm, kitty, fonts, docker, docker-compose, golang, build-essential, lolcat
+    
+    # TODO: install for mac iterm2, fonts, nexcloud, vscode-insiders
+    
+fi
+
+if [ "$ACTION" == "restore" ]; then
+    # restore config from backup
+    for dir in "${CONFIG_BACKUP_DIRS[@]}"; do
+        if [ -d "${CONFIG_BACKUP}/${dir}" ]; then
+            echo "Restoring ${dir} config..."
+            mkdir -p "${CONFIG_HOME}/${dir}"
+            cp -r "${CONFIG_BACKUP}/${dir}/" "${CONFIG_HOME}/${dir}"
+        fi
+    done
+
+    # Restore zsh
+    cp -r "${ZSH_BACKUP}/.zshrc" "${HOME}/.zshrc"
+    cp -r "${ZSH_BACKUP}/.zsh_profile" "${HOME}/.zsh_profile"
+    cp -r "${ZSH_BACKUP}/.zprofile" "${HOME}/.zprofile"
+
+    # Restore banner
+    cp -r "${DIR}/.banner" "${HOME}/.banner"
+
+    # Restore aws config
+    mkdir -p "${HOME}/.aws"
+    cp -r "${AWS_BACKUP}/config" "${HOME}/.aws/config"
+
+    # Restore git config
+    cp -r "${GIT_BACKUP}/.gitconfig" "${HOME}/.gitconfig"
+
+    # Restore scripts
+    mkdir -p "${HOME}/.local/scripts"
+    cp -r "${SCRIPTS_BACKUP}/scripts/" "${HOME}/.local/scripts/"
+fi

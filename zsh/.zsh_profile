@@ -1,0 +1,87 @@
+# zsh profile/rc settings
+# protects settings from being clobbered by noob scripts
+
+# TODO addd some MacOS detection
+[[ $(uname -a) =~ "Darwin" ]] && isMac=true || isMac=false
+
+CONFIG_HOME=$HOME/.config
+XDG_CONFIG_HOME=$CONFIG_HOME
+PERSONAL=$CONFIG_HOME/personal
+source $PERSONAL/env
+for i in `find -L $PERSONAL`; do
+    source $i
+done
+
+export EDITOR='nvim'
+
+# Add NVM to Path and completion
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+#Go
+export GOROOT='/usr/local/go'
+export GOPATH=$HOME/code/go
+
+export GIT_EDITOR=$VIM
+export DOTFILES=$HOME/.dotfiles
+
+addToPathFront "$GOPATH/bin"
+# Personal Scripts
+addToPathFront "$HOME/.local/scripts"
+
+###################################
+# MacOS specific Settings
+###################################
+
+# bin PATH for home-brew apps
+addToPathFront "/opt/homebrew/bin"
+
+addToPathFront "/opt/homebrew/opt/coreutils/libexec/gnubin"
+addToPathFront "/opt/homebrew/opt/gnu-indent/libexec/gnubin"
+addToPathFront "/opt/homebrew/opt/gnu-tar/libexec/gnubin"
+addToPathFront "/opt/homebrew/opt/gnu-sed/libexec/gnubin"
+addToPathFront "/opt/homebrew/opt/grep/libexec/gnubin"
+addToPathFront "/opt/homebrew/opt/openssl@1.1/bin"
+addToPathFront "/opt/homebrew/opt/mysql@5.7/bin"
+
+
+# OSX Shortcuts
+bindkey "[D" backward-word
+bindkey "[C" forward-word
+bindkey "^[a" beginning-of-line
+bindkey "^[e" end-of-line
+
+
+###################################
+# Aliases and other shortucts
+###################################
+
+if ! type "which nvim" > /dev/null; then
+  alias vim=nvim
+fi
+
+# Additional Git Shortcuts
+alias nb='git checkout -b'
+alias gc='git commit -v -m'
+alias dev='git checkout develop'
+alias gcm='git checkout main'
+alias gl='git log --oneline --graph --decorate --all' # should be also in .gitconfig under 'git tree'
+alias nightly='git checkout nightly'
+
+# App shortcuts
+alias redis='redis-server /opt/homebrew/etc/redis.config'
+
+# Banner message
+# Instant prompt angry, color not working, fix later
+echo "$(cat $HOME/.banner)" | lolcat
+
+###################################
+# Customization of Spaceship theme
+####################################
+# Removes docker version because not required for now
+# SPACESHIP_DOCKER_SHOW=false
+# Removes node package because no public development is being done
+# SPACESHIP_PACKAGE_SHOW=false
+
+

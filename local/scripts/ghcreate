@@ -1,0 +1,68 @@
+#!/bin/bash
+# Creates a Github repo based on the current directory
+
+# TODO: move to global ENV variable or read from GH client
+
+GH_USERNAME=$(gh auth status | grep -oP '(?<=Logged in to github.com as ).*(?= \()')
+
+if ! command -v gh > /dev/null 2>&1; then
+    echo "gh client not present! please install."
+    exit 1;
+fi
+current_dir=$(pwd)
+REPO_NAME=$(basename "$current_dir")
+
+# Check if repo already exists
+REPO_EXISTS=1
+if [[ -z $(gh repo list | grep "'^$GH_USERNAME/$REPO_NAME\s'") ]]; then
+	REPO_EXISTS=0
+fi
+
+if [[ $REPO_EXISTS ]]; then
+	echo "repo $GH_USERNAME/$REPO_NAME already exists."
+else
+
+	ISSUES_FLAG="--disable-issues"
+	WIKI_FLAG="--disable-wiki"
+	REPO_VISIBILITY="--public"
+
+	echo "Creating a new github repo for called '$GH_USERNAME/$REPO_NAME'."
+	if [ -n "$ISSUES_FLAG" ]; then
+		echo "* Issues: disabled"
+	else
+		echo "* Issues: enabled"
+	fi
+
+	if [ -n "$WIKI_FLAG" ]; then
+		echo "* Wiki: disabled"
+	else
+		echo "* Wiki: enabled"
+	fi
+	if [[ $REPO_VISIBILITY == *public ]]; then
+		echo "* Visibility: public"
+	else
+		echo "* Visibility: private"
+	fi
+	read -n 1 -p "Do you want to create this repo?(y/n)" res_char
+
+	echo " "
+
+	if [ "$res_char" != "y" ]; then
+		exit 0
+	fi
+
+	cmd_string="gh repo create $REPO_NAME $ISSUES_FLAG $WIKI_FLAG $REPO_VISIBILITY"
+
+	eval "$cmd_string"
+
+fi
+
+read -n 1 -p "Attach current repo to 'main' branch and push to github?(y/n)" res_char2
+echo " "
+if [ "$res_char2" != "y" ]; then
+	echo "bye idiot"
+	exit 0
+fi
+
+eval "git remote add origin git@github.com:$GH_USERNAME/$REPO_NAME.git"
+eval "git push -u origin main"
