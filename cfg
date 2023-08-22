@@ -109,7 +109,7 @@ run_restore() {
         if [ -d "${CONFIG_BACKUP}/${dir}" ]; then
             echo "Restoring ${dir} config..."
             mkdir -p "${CONFIG_HOME}/${dir}"
-            cp -r "${CONFIG_BACKUP}/${dir}/" "${CONFIG_HOME}/${dir}"
+            cp -r "${CONFIG_BACKUP}/${dir}" "${CONFIG_HOME}/"
         fi
     done
 
@@ -136,6 +136,9 @@ run_restore() {
     echo "Restoring scripts..."
     mkdir -p "${HOME}/.local/scripts"
     cp -r "${LOCAL_BACKUP}/scripts/" "${HOME}/.local/scripts/"
+
+    echo "Restoring complete!"
+    echo "Run \`cfg install\` to install packages"
 }
 
 run_install() {
