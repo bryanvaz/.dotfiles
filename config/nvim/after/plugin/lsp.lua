@@ -4,12 +4,15 @@
 -- 	 bothered to figure out how to define load order
 require("mason").setup()
 require("mason-lspconfig").setup {
-	ensure_installed = { 
+	ensure_installed = {
 		"tsserver",
 		"eslint",
 		"lua_ls",
 		"rust_analyzer",
 		"gopls",
+		"ocamllsp",
+        "volar",
+        "tailwindcss",
 	},
 }
 
@@ -24,13 +27,13 @@ local cmp_mappings = lsp.defaults.cmp_mappings({
 	["<C-Space>"] = cmp.mapping.complete(),
 })
 
--- cmp_mappings['<Tab>'] = nil
--- cmp_mappings['<S-Tab>'] = nil
+-- DISCONNECT TAB FOR COPILOT
+cmp_mappings['<Tab>'] = nil
+cmp_mappings['<S-Tab>'] = nil
 
 lsp.setup_nvim_cmp({
 	mapping = cmp_mappings
 })
-
 
 lsp.on_attach(function(client, bufnr)
 	lsp.default_keymaps({buffer = bufnr})

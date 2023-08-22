@@ -1,0 +1,8 @@
+[user]
+	email = bryan.git@vaz.sh
+	name = Bryan Vaz
+[core]
+	editor = nvim
+	excludesfile = /Users/bryan/.gitignore_global
+[alias]
+	tree = log --oneline --graph --decorate --all
