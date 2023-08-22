@@ -55,7 +55,7 @@ CONFIG_BACKUP_DIRS=(
 )
 
 main() {
-    echo "You are running the following OS: ${OS}"
+    echo -e "You are running the following OS: ${OS}"
 
     # run ensure_prerequisites
     ensure_prerequisites
@@ -75,42 +75,42 @@ main() {
         exit 0
     fi
 
-    echo "Please run one of \`cfg [stash|restore|install]\`"
+    echo -e "Please run one of \`cfg [stash|restore|install]\`"
 }
 
 run_stash() {
     # Loop through CONFIG_BACKUP_DIRS and backup each directory
     for config_backup_dir in "${CONFIG_BACKUP_DIRS[@]}"; do
         if [ -d "${CONFIG_HOME}/${config_backup_dir}" ]; then
-            echo "Backing up ${config_backup_dir} config..."
+            echo -e "Backing up ${config_backup_dir} config..."
             mkdir -p "${CONFIG_BACKUP}/${config_backup_dir}"
             cp -r "${CONFIG_HOME}/${config_backup_dir}/" "${CONFIG_BACKUP}/${config_backup_dir}/"
         fi
     done
 
     # Backup zsh
-    echo "Backing up zsh config..."
+    echo -e "Backing up zsh config..."
     mkdir -p "${ZSH_BACKUP}"
     cp -r "${HOME}/.zshrc" "${ZSH_BACKUP}/.zshrc"
     cp -r "${HOME}/.zsh_profile" "${ZSH_BACKUP}/.zsh_profile"
     cp -r "${HOME}/.zprofile" "${ZSH_BACKUP}/.zprofile"
 
     # Backup banner
-    echo "Backing up banner..."
+    echo -e "Backing up banner..."
     cp -r "${HOME}/.banner" "${DIR}/.banner"
 
     # Backup aws config
-    echo "Backing up aws config..."
+    echo -e "Backing up aws config..."
     mkdir -p "${AWS_BACKUP}"
     cp -r "${HOME}/.aws/config" "${AWS_BACKUP}/config"
 
     # Backup git config
-    echo "Backing up git config..."
+    echo -e "Backing up git config..."
     mkdir -p "${GIT_BACKUP}/${OS}"
     cp -r "${HOME}/.gitconfig" "${GIT_BACKUP}/${OS}/.gitconfig"
 
     # backup scritps
-    echo "Backing up scripts..."
+    echo -e "Backing up scripts..."
     mkdir -p "${LOCAL_BACKUP}/scripts"
     cp -r "${HOME}/.local/scripts/" "${LOCAL_BACKUP}/scripts/"
 }
@@ -119,50 +119,50 @@ run_restore() {
     # restore config from backup
     for dir in "${CONFIG_BACKUP_DIRS[@]}"; do
         if [ -d "${CONFIG_BACKUP}/${dir}" ]; then
-            echo "Restoring ${dir} config..."
+            echo -e "Restoring ${dir} config..."
             mkdir -p "${CONFIG_HOME}/${dir}"
             cp -r "${CONFIG_BACKUP}/${dir}" "${CONFIG_HOME}/"
         fi
     done
 
     # Restore zsh
-    echo "Restoring zsh config..."
+    echo -e "Restoring zsh config..."
     cp -r "${ZSH_BACKUP}/.zshrc" "${HOME}/.zshrc"
     cp -r "${ZSH_BACKUP}/.zsh_profile" "${HOME}/.zsh_profile"
     cp -r "${ZSH_BACKUP}/.zprofile" "${HOME}/.zprofile"
 
     # Restore banner
-    echo "Restoring banner..."
+    echo -e "Restoring banner..."
     cp -r "${DIR}/.banner" "${HOME}/.banner"
 
     # Restore aws config
-    echo "Restoring aws config..."
+    echo -e "Restoring aws config..."
     mkdir -p "${HOME}/.aws"
     cp -r "${AWS_BACKUP}/config" "${HOME}/.aws/config"
 
     # Restore git config
-    echo "Restoring git config..."
+    echo -e "Restoring git config..."
     cp -r "${GIT_BACKUP}/${OS}/.gitconfig" "${HOME}/.gitconfig"
 
     # Restore scripts
-    echo "Restoring scripts..."
+    echo -e "Restoring scripts..."
     mkdir -p "${HOME}/.local/scripts"
     cp -r "${LOCAL_BACKUP}/scripts/" "${HOME}/.local/scripts/"
 
-    echo "Restoring complete!"
-    echo "Run \`cfg install\` to install packages"
+    echo -e "Restoring complete!"
+    echo -e "Run \`cfg install\` to install packages"
 }
 
 run_install() {
     # TODO: Implement install functionality
-    echo "Installing packages..."
+    echo -e "Installing packages..."
 
     if [ "$OS" == "linux" ]; then
         # TODO: add support for RPM, ARCH, and NIX
         if has_apt; then
             install_debian
         else
-            echo "apt not found! Bailing out!"
+            echo -e "apt not found! Bailing out!"
             exit 1
         fi
     elif [ "$OS" == "darwin" ]; then
@@ -184,49 +184,49 @@ run_install() {
 
 install_debian() {
     sudo apt update
-    echo "Do you want to upgrade all your packages before getting started? (recommended)"
+    echo -e "Do you want to upgrade all your packages before getting started? (recommended)"
     read -n 1 -p "Upgrade packages? (y/n)" res_char
-    echo " "
+    echo -e " "
     if [ "$res_char" == "y" ]; then
         sudo apt upgrade -y
-        echo "******* upgrade complete *******\n"
+        echo -e "******* upgrade complete *******\n"
     fi
 
-    echo "Installing base packages..."
-    echo "The following packages will be installed if not present: ${APT_PACKAGES[@]}"
-    echo "Do you want to continue? (if not will skip to next step)"
+    echo -e "Installing base packages..."
+    echo -e "The following packages will be installed if not present: ${APT_PACKAGES[@]}"
+    echo -e "Do you want to continue? (if not will skip to next step)"
     read -n 1 -p "Install base packages? (y/n)" res_char
-    echo " "
+    echo -e " "
     if [ "$res_char" == "y" ]; then
         sudo apt-get install -y "${APT_PACKAGES[@]}"
-        echo "******* base packages installed *******\n"
+        echo -e "******* base packages installed *******\n"
     fi
 
     # Now install special stuff
     if has_oh_my_zsh; then
-        echo "oh-my-zsh already installed! Skipping..."
+        echo -e "oh-my-zsh already installed! Skipping..."
     else
-        echo "Installing oh-my-zsh..."
+        echo -e "Installing oh-my-zsh..."
         sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-        echo "******* oh-my-zsh installed! *******\n"
+        echo -e "******* oh-my-zsh installed! *******\n"
     fi
     install_zsh_theme
 
-    # echo "TODO: Activate oh-my-zsh"
+    # echo -e "TODO: Activate oh-my-zsh"
     # Check if shell is zsh, if not, activate
     if [ -n "$ZSH_VERSION" ]; then
-        echo "Zsh is already activated"
+        echo -e "Zsh is already activated"
     else
-        echo "Activating zsh..."
+        echo -e "Activating zsh..."
         chsh -s $(which zsh)
-        echo "******* Zsh activated! *******\n"
+        echo -e "******* Zsh activated! *******\n"
     fi
 
     if has_neovim; then
-        echo "Neovim already installed! Skipping..."
+        echo -e "Neovim already installed! Skipping..."
     else
         # Install neovim
-        echo "Installing Neovim from nightly (gotta do nightly, sorry)..."
+        echo -e "Installing Neovim from nightly (gotta do nightly, sorry)..."
         # mkdir -p /tmp/nvim
         # wget -O /tmp/nvim-linux64.tar.gz https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz
         # tar -xzf /tmp/nvim-linux64.tar.gz -C /tmp/nvim
@@ -235,53 +235,53 @@ install_debian() {
         sudo mv /tmp/nvim.appimage /usr/local/lib/neovim/nvim.appimage
         sudo chmod 755 /usr/local/lib/neovim/nvim
         sudo ln -s /usr/local/lib/neovim/nvim /usr/local/bin/nvim
-        echo "******* Neovim installed! *******\n"
+        echo -e "******* Neovim installed! *******\n"
     fi
 
     
 
     # Install gh
     if has_gh; then
-        echo "gh already installed! Skipping..."
+        echo -e "gh already installed! Skipping..."
     else
-        echo "Install Github Client? (recommended)"
+        echo -e "Install Github Client? (recommended)"
         read -n 1 -p "Install gh? (y/n)" res_char
-        echo " "
+        echo -e " "
         if [ "$res_char" == "y" ]; then
-            echo "Installing gh..."
+            echo -e "Installing gh..."
             type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
             curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
             sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
-            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            echo -e "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
             sudo apt update
             sudo apt install gh -y
-            echo "******* gh installed! *******\n"
+            echo -e "******* gh installed! *******\n"
         fi
     fi
 
     # Install docker
     if docker_installed; then
-        echo "Docker already installed! Skipping..."
+        echo -e "Docker already installed! Skipping..."
     else
-        echo "Install Docker? (recommended)"
+        echo -e "Install Docker? (recommended)"
         read -n 1 -p "Install Docker? (y/n)" res_char
-        echo " "
+        echo -e " "
         if [ "$res_char" == "y" ]; then
-            echo "Installing Docker..."
+            echo -e "Installing Docker..."
 
 
-            echo "Setup docker group for non-root access? (recommended)"
+            echo -e "Setup docker group for non-root access? (recommended)"
             read -n 1 -p "Setup docker group? (y/n)" res_char
-            echo " "
+            echo -e " "
             if [ "$res_char" == "y" ]; then
                 if getent group docker > /dev/null; then
-                    echo "docker group already exists, adding user ..."
+                    echo -e "docker group already exists, adding user ..."
                 else
                     sudo groupadd docker
                 fi
                 sudo usermod -aG docker $USER
                 newgrp docker
-                echo "******* Docker group setup! *******\n"
+                echo -e "******* Docker group setup! *******\n"
             fi
 
             sudo apt-get remove docker docker-engine docker.io containerd runc
@@ -308,35 +308,35 @@ install_debian() {
             if [ "$DISTRO" == "ubuntu" ]; then
                 echo \
                     "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-                    "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+                    "$(. /etc/os-release && echo -e "$VERSION_CODENAME")" stable" | \
                     sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
             elif [ "$DISTRO" == "debian" ]; then
                 echo \
                     "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
-                    "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+                    "$(. /etc/os-release && echo -e "$VERSION_CODENAME")" stable" | \
                     sudo tee /etc/apt/sources.list.d/docker.list > /dev/null    
             else
                 echo \
                     "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
-                    "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+                    "$(. /etc/os-release && echo -e "$VERSION_CODENAME")" stable" | \
                     sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
             fi
 
             sudo apt-get update
             sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-            echo "******* Docker installed! *******\n"
+            echo -e "******* Docker installed! *******\n"
         fi
     fi
 
     # Install lolcat
     if command -v lolcat > /dev/null; then
-        echo "lolcat already installed! Skipping..."
+        echo -e "lolcat already installed! Skipping..."
     else
-        echo "Install lolcat? (recommended)"
+        echo -e "Install lolcat? (recommended)"
         read -n 1 -p "Install lolcat? (y/n)" res_char
-        echo " "
+        echo -e " "
         if [ "$res_char" == "y" ]; then
-            echo "Installing lolcat..."
+            echo -e "Installing lolcat..."
             wget -O /tmp/figurine_linux_v1.2.1.tar.gz https://github.com/arsham/rainbow/releases/download/v1.2.1/figurine_linux_v1.2.1.tar.gz
             mkdir -p /tmp/figurine
             tar -xzf /tmp/figurine_linux_v1.2.1.tar.gz -C /tmp/figurine
@@ -344,30 +344,30 @@ install_debian() {
             sudo mv /tmp/figurine/deploy/rainbow /usr/local/lib/figurine/rainbow
             sudo chmod 755 /usr/local/lib/figurine/rainbow
             ln -s /usr/local/lib/figurine/rainbow /usr/local/bin/lolcat
-            echo "******* lolcat installed! *******\n"
+            echo -e "******* lolcat installed! *******\n"
         fi
     fi
 
     # Install build-essential
-    echo "Do you want to install build essentials? (recommended if not a ops server)"
+    echo -e "Do you want to install build essentials? (recommended if not a ops server)"
     read -n 1 -p "Install build-essential? (y/n)" res_char
-    echo " "
+    echo -e " "
     if [ "$res_char" == "y" ]; then
         sudo apt-get install build-essential
     fi
 
     # Install nvm
-    echo "TODO: Install nvm and node"
+    echo -e "TODO: Install nvm and node"
 
-    echo "TODO: Install golang"
+    echo -e "TODO: Install golang"
 
-    echo "TODO: Install ocaml"
+    echo -e "TODO: Install ocaml"
 
-    echo "TODO: Install rust toolchain"
+    echo -e "TODO: Install rust toolchain"
 
-    echo "TODO: Install zig toolchain"
+    echo -e "TODO: Install zig toolchain"
 
-    echo "TODO: Install seadrive"
+    echo -e "TODO: Install seadrive"
 
 
 
@@ -383,18 +383,18 @@ install_debian() {
 }
 
 install_mac() {
-    echo "not implemented for mac. Bailing out!"
+    echo -e "not implemented for mac. Bailing out!"
     exit 1
 }
 install_windows() {
-    echo "not implemented for windows. Bailing out!"
+    echo -e "not implemented for windows. Bailing out!"
     exit 1
 }
 
 ensure_prerequisites() {
     # Check if git is installed
     if ! [ -x "$(command -v git)" ]; then
-        echo "Git not installed! Installing git ..." >&2
+        echo -e "Git not installed! Installing git ..." >&2
         install_git
     fi
 
@@ -408,14 +408,14 @@ ensure_prerequisites() {
 ensure_mac_prequisites() {
     # Check if brew is installed
     if ! [ -x "$(command -v brew)" ]; then
-        echo "Homebrew not installed! Installing homebrew ..." >&2
+        echo -e "Homebrew not installed! Installing homebrew ..." >&2
         exit 1
     fi
 }
 ensure_windows_prequisites() {
     # Check if choco is installed
     if ! [ -x "$(command -v choco)" ]; then
-        echo "Chocolatey not installed! Installing chocolatey ..." >&2
+        echo -e "Chocolatey not installed! Installing chocolatey ..." >&2
         install_choco
     fi
 }
@@ -507,19 +507,19 @@ docker_installed() {
 install_zsh_theme() {
     REQUIRED_THEME=$(grep '^ZSH_THEME=\"' $DIR/zsh/.zshrc | awk -F'"' '{print $2}')
     if [ -d "${HOME}/.oh-my-zsh/custom/themes/${REQUIRED_THEME}" ]; then
-        echo "ZSH theme ${REQUIRED_THEME} already installed! Skipping..."
+        echo -e "ZSH theme ${REQUIRED_THEME} already installed! Skipping..."
         return 0 # true
     else
-        echo "Installing ZSH theme ${REQUIRED_THEME}..."
+        echo -e "Installing ZSH theme ${REQUIRED_THEME}..."
         if [ "$REQUIRED_THEME" == "powerlevel10k/powerlevel10k" ]; then 
             git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
-            echo "In theory if you run \`p10k configure\` if you're fonts are weird you should be good to go!"
-            echo "******* ZSH theme ${REQUIRED_THEME} installed! *******"
+            echo -e "In theory if you run \`p10k configure\` if you're fonts are weird you should be good to go!"
+            echo -e "******* ZSH theme ${REQUIRED_THEME} installed! *******"
             return 0 # true
         fi
     fi
 
-    echo "Warning could not install ZSH theme ${REQUIRED_THEME}! Unknown theme!"
+    echo -e "Warning could not install ZSH theme ${REQUIRED_THEME}! Unknown theme!"
 
     return 1 # false
 }
