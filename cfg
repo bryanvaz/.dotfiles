@@ -133,7 +133,7 @@ if [ "$ACTION" == "install" ]; then
     # TODO: install for linux dev servers: fonts, nextcloud, nvm, gh, docker, docker-compose, golang, build-essential, lolcat
     # TODO: install for linux desktops: kitty, fonts, nextcloud, vscode-insiders, nvm, gh, docker, docker-compose, golang, build-essential, lolcat
     # TODO: install for mac iterm2, fonts, nexcloud, vscode-insiders, nvm, gh, docker, docker-compose, golang, build-essential, lolcat
-    
+   # TODO: Add seafile drive : https://help.seafile.com/drive_client/drive_client_for_linux/ 
 fi
 
 if [ "$ACTION" == "restore" ]; then
