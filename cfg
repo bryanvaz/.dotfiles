@@ -114,21 +114,26 @@ run_restore() {
     done
 
     # Restore zsh
+    echo "Restoring zsh config..."
     cp -r "${ZSH_BACKUP}/.zshrc" "${HOME}/.zshrc"
     cp -r "${ZSH_BACKUP}/.zsh_profile" "${HOME}/.zsh_profile"
     cp -r "${ZSH_BACKUP}/.zprofile" "${HOME}/.zprofile"
 
     # Restore banner
+    echo "Restoring banner..."
     cp -r "${DIR}/.banner" "${HOME}/.banner"
 
     # Restore aws config
+    echo "Restoring aws config..."
     mkdir -p "${HOME}/.aws"
     cp -r "${AWS_BACKUP}/config" "${HOME}/.aws/config"
 
     # Restore git config
+    echo "Restoring git config..."
     cp -r "${GIT_BACKUP}/${OS}/.gitconfig" "${HOME}/.gitconfig"
 
     # Restore scripts
+    echo "Restoring scripts..."
     mkdir -p "${HOME}/.local/scripts"
     cp -r "${LOCAL_BACKUP}/scripts/" "${HOME}/.local/scripts/"
 }
