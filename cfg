@@ -15,6 +15,18 @@ ACTION=$1
 # Determine the operating system (either `linux` or `darwin` or `windows`)
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
 
+if [ "$OS" == "linux" ]; then
+    if [ -f /etc/os-release ]; then 
+        if grep -q 'ID=ubuntu' /etc/os-release; then
+            DISTRO="ubuntu"
+        elif grep -q 'ID=debian' /etc/os-release; then
+            DISTRO="debian"
+        fi
+    else
+        DISTRO="unknown"
+    fi
+fi
+
 # List of linux packages to install
 APT_PACKAGES=(
     git
@@ -177,6 +189,7 @@ install_debian() {
     echo " "
     if [ "$res_char" == "y" ]; then
         sudo apt upgrade -y
+        echo "******* upgrade complete *******\n"
     fi
 
     echo "Installing base packages..."
@@ -186,6 +199,7 @@ install_debian() {
     echo " "
     if [ "$res_char" == "y" ]; then
         sudo apt-get install -y "${APT_PACKAGES[@]}"
+        echo "******* base packages installed *******\n"
     fi
 
     # Now install special stuff
@@ -194,6 +208,7 @@ install_debian() {
     else
         echo "Installing oh-my-zsh..."
         sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+        echo "******* oh-my-zsh installed! *******\n"
     fi
     install_zsh_theme
 
@@ -204,37 +219,156 @@ install_debian() {
     else
         echo "Activating zsh..."
         chsh -s $(which zsh)
-        echo "Zsh activated"
+        echo "******* Zsh activated! *******\n"
     fi
 
-    # Install neovim
-    echo "Installing Neovim from nightly (gotta do source, sorry)..."
-    mkdir -p /tmp/nvim
-    wget -O /tmp/nvim-linux64.tar.gz https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz
-    tar -xzf /tmp/nvim-linux64.tar.gz -C /tmp/nvim
+    if has_neovim; then
+        echo "Neovim already installed! Skipping..."
+    else
+        # Install neovim
+        echo "Installing Neovim from nightly (gotta do nightly, sorry)..."
+        # mkdir -p /tmp/nvim
+        # wget -O /tmp/nvim-linux64.tar.gz https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz
+        # tar -xzf /tmp/nvim-linux64.tar.gz -C /tmp/nvim
+        wget -O /tmp/nvim.appimage https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage
+        sudo mkdir -p /usr/local/lib/neovim
+        sudo mv /tmp/nvim.appimage /usr/local/lib/neovim/nvim.appimage
+        sudo chmod 755 /usr/local/lib/neovim/nvim
+        sudo ln -s /usr/local/lib/neovim/nvim /usr/local/bin/nvim
+        echo "******* Neovim installed! *******\n"
+    fi
 
-    echo "Neovim installed"
-
-    # Install nvm
-    echo "TODO: Install nvm"
+    
 
     # Install gh
-    echo "TODO: Install gh"
+    if has_gh; then
+        echo "gh already installed! Skipping..."
+    else
+        echo "Install Github Client? (recommended)"
+        read -n 1 -p "Install gh? (y/n)" res_char
+        echo " "
+        if [ "$res_char" == "y" ]; then
+            echo "Installing gh..."
+            type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+            sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt update
+            sudo apt install gh -y
+            echo "******* gh installed! *******\n"
+        fi
+    fi
 
     # Install docker
-    echo "TODO: Install docker"
+    if docker_installed; then
+        echo "Docker already installed! Skipping..."
+    else
+        echo "Install Docker? (recommended)"
+        read -n 1 -p "Install Docker? (y/n)" res_char
+        echo " "
+        if [ "$res_char" == "y" ]; then
+            echo "Installing Docker..."
+
+
+            echo "Setup docker group for non-root access? (recommended)"
+            read -n 1 -p "Setup docker group? (y/n)" res_char
+            echo " "
+            if [ "$res_char" == "y" ]; then
+                if getent group docker > /dev/null; then
+                    echo "docker group already exists, adding user ..."
+                else
+                    sudo groupadd docker
+                fi
+                sudo usermod -aG docker $USER
+                newgrp docker
+                echo "******* Docker group setup! *******\n"
+            fi
+
+            sudo apt-get remove docker docker-engine docker.io containerd runc
+            sudo apt-get update
+            sudo apt-get install \
+                apt-transport-https \
+                ca-certificates \
+                curl \
+                gnupg \
+                lsb-release
+            sudo install -m 0755 -d /etc/apt/keyrings
+
+            if [ "$DISTRO" == "ubuntu" ]; then
+                curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+            elif [ "$DISTRO" == "debian" ]; then
+                curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+            else
+                curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+            fi
+
+            sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+
+            if [ "$DISTRO" == "ubuntu" ]; then
+                echo \
+                    "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+                    "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+                    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+            elif [ "$DISTRO" == "debian" ]; then
+                echo \
+                    "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+                    "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+                    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null    
+            else
+                echo \
+                    "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+                    "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+                    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+            fi
+
+            sudo apt-get update
+            sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+            echo "******* Docker installed! *******\n"
+        fi
+    fi
 
     # Install lolcat
-    echo "TODO: Install lolcat"
+    if command -v lolcat > /dev/null; then
+        echo "lolcat already installed! Skipping..."
+    else
+        echo "Install lolcat? (recommended)"
+        read -n 1 -p "Install lolcat? (y/n)" res_char
+        echo " "
+        if [ "$res_char" == "y" ]; then
+            echo "Installing lolcat..."
+            wget -O /tmp/figurine_linux_v1.2.1.tar.gz https://github.com/arsham/rainbow/releases/download/v1.2.1/figurine_linux_v1.2.1.tar.gz
+            mkdir -p /tmp/figurine
+            tar -xzf /tmp/figurine_linux_v1.2.1.tar.gz -C /tmp/figurine
+            sudo mkdir -p /usr/local/lib/figurine
+            sudo mv /tmp/figurine/deploy/rainbow /usr/local/lib/figurine/rainbow
+            sudo chmod 755 /usr/local/lib/figurine/rainbow
+            ln -s /usr/local/lib/figurine/rainbow /usr/local/bin/lolcat
+            echo "******* lolcat installed! *******\n"
+        fi
+    fi
 
     # Install build-essential
-    echo "TODO: Install build-essential"
     echo "Do you want to install build essentials? (recommended if not a ops server)"
     read -n 1 -p "Install build-essential? (y/n)" res_char
     echo " "
     if [ "$res_char" == "y" ]; then
         sudo apt-get install build-essential
     fi
+
+    # Install nvm
+    echo "TODO: Install nvm and node"
+
+    echo "TODO: Install golang"
+
+    echo "TODO: Install ocaml"
+
+    echo "TODO: Install rust toolchain"
+
+    echo "TODO: Install zig toolchain"
+
+    echo "TODO: Install seadrive"
+
 
 
     # TODO: instal zsh, zsh theme, neovim, python3
@@ -346,6 +480,29 @@ has_oh_my_zsh() {
         return 0 # false
     fi
 }
+has_neovim() {
+    if command -v nvim > /dev/null; then
+        return 1 # true
+    else
+        return 0 # false
+    fi
+}
+
+has_gh() {
+    if command -v gh > /dev/null; then
+        return 1 # true
+    else
+        return 0 # false
+    fi
+}
+
+docker_installed() {
+    if command -v docker > /dev/null; then
+        return 1 # true
+    else
+        return 0 # false
+    fi
+}
 
 install_zsh_theme() {
     REQUIRED_THEME=$(grep '^ZSH_THEME=\"' $DIR/zsh/.zshrc | awk -F'"' '{print $2}')
@@ -354,9 +511,10 @@ install_zsh_theme() {
         return 0 # true
     else
         echo "Installing ZSH theme ${REQUIRED_THEME}..."
-        if [ "$REQUIRED_THEME" = "powerlevel10k/powerlevel10k" ]; then 
+        if [ "$REQUIRED_THEME" == "powerlevel10k/powerlevel10k" ]; then 
             git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
             echo "In theory if you run \`p10k configure\` if you're fonts are weird you should be good to go!"
+            echo "******* ZSH theme ${REQUIRED_THEME} installed! *******"
             return 0 # true
         fi
     fi
