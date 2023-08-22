@@ -5,9 +5,9 @@ CONFIG_HOME="${HOME}/.config/"
 # Get the current location of this bash script
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 CONFIG_BACKUP="${DIR}/config/"
-ZSH_BACKUP="${DIR}/zsh/"
-AWS_BACKUP="${DIR}/aws/"
-GIT_BACKUP="${DIR}/git/"
+ZSH_BACKUP="${DIR}/zsh"
+AWS_BACKUP="${DIR}/aws"
+GIT_BACKUP="${DIR}/git"
 LOCAL_BACKUP="${DIR}/local"
 
 ACTION=$1
@@ -126,11 +126,11 @@ run_restore() {
     cp -r "${AWS_BACKUP}/config" "${HOME}/.aws/config"
 
     # Restore git config
-    cp -r "${GIT_BACKUP}/.gitconfig" "${HOME}/.gitconfig"
+    cp -r "${GIT_BACKUP}/${OS}/.gitconfig" "${HOME}/.gitconfig"
 
     # Restore scripts
     mkdir -p "${HOME}/.local/scripts"
-    cp -r "${SCRIPTS_BACKUP}/scripts/" "${HOME}/.local/scripts/"
+    cp -r "${LOCAL_BACKUP}/scripts/" "${HOME}/.local/scripts/"
 }
 
 run_install() {
