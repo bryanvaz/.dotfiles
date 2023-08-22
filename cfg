@@ -183,8 +183,10 @@ run_install() {
 }
 
 install_debian() {
+    echo -e "\nUpdating APT repos before we begin..."
     sudo apt update
-    echo -e "Do you want to upgrade all your packages before getting started? (recommended)"
+
+    echo -e "\nDo you want to upgrade all your packages before getting started? (recommended)"
     read -n 1 -p "Upgrade packages? (y/n)" res_char
     echo -e " "
     if [ "$res_char" == "y" ]; then
