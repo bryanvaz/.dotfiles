@@ -214,7 +214,7 @@ install_debian() {
         chsh -s $(which zsh)
         echo -e "******* Zsh activated! *******\n"
     fi
-    
+
     # Now install special stuff
     if has_oh_my_zsh; then
         echo -e "oh-my-zsh already installed! Skipping..."
@@ -510,17 +510,17 @@ docker_installed() {
 
 install_zsh_theme() {
     REQUIRED_THEME=$(grep '^ZSH_THEME=\"' $DIR/zsh/.zshrc | awk -F'"' '{print $2}')
-    if [ -d "${HOME}/.oh-my-zsh/custom/themes/${REQUIRED_THEME}" ]; then
-        echo -e "ZSH theme ${REQUIRED_THEME} already installed! Skipping..."
-        return 0 # true
-    else
-        echo -e "Installing ZSH theme ${REQUIRED_THEME}..."
-        if [ "$REQUIRED_THEME" == "powerlevel10k/powerlevel10k" ]; then 
-            git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
-            echo -e "In theory if you run \`p10k configure\` if you're fonts are weird you should be good to go!"
-            echo -e "******* ZSH theme ${REQUIRED_THEME} installed! *******"
+    if [ "$REQUIRED_THEME" == "powerlevel10k/powerlevel10k" ]; then 
+        if [ -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" ]; then
+            echo -e "ZSH theme ${REQUIRED_THEME} already installed! Skipping..."
             return 0 # true
         fi
+        echo -e "Installing ZSH theme ${REQUIRED_THEME}..."
+        git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+        echo -e "In theory if you run \`p10k configure\` if you're fonts are weird you should be good to go!"
+        echo -e "******* ZSH theme ${REQUIRED_THEME} installed! *******\n"
+
+        return 0 # true
     fi
 
     echo -e "Warning could not install ZSH theme ${REQUIRED_THEME}! Unknown theme!"
