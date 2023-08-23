@@ -42,6 +42,7 @@ APT_PACKAGES=(
     # awk
     gawk
     software-properties-common
+    zsh
 )
 
 # List of mac packages to install
@@ -205,25 +206,28 @@ install_debian() {
         echo -e "******* base packages installed *******\n"
     fi
 
-    # echo -e "TODO: Activate oh-my-zsh"
-    # Check if shell is zsh, if not, activate
-    if [ -n "$ZSH_VERSION" ]; then
-        echo -e "Zsh is already activated"
+    if ! has_zsh; then
+        echo -e "ZSH not installed, cannot configure zsh. Skipping zsh setup..."
     else
-        echo -e "Activating zsh..."
-        chsh -s $(which zsh)
-        echo -e "******* Zsh activated! *******\n"
-    fi
+        if is_zsh_active; then
+            echo -e "Zsh is already activated"
+        else
+            echo -e "Activating zsh..."
+            chsh -s $(which zsh)
+            echo -e "******* Zsh activated! *******\n"
+        fi
 
-    # Now install special stuff
-    if has_oh_my_zsh; then
-        echo -e "oh-my-zsh already installed! Skipping..."
-    else
-        echo -e "Installing oh-my-zsh..."
-        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-        echo -e "******* oh-my-zsh installed! *******\n"
+        # Now install special stuff
+        if has_oh_my_zsh; then
+            echo -e "oh-my-zsh already installed! Skipping..."
+        else
+            echo -e "Installing oh-my-zsh..."
+            sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+            echo -e "******* oh-my-zsh installed! *******\n"
+        fi
+        install_zsh_theme
     fi
-    install_zsh_theme
+    
 
 
     if has_neovim; then
@@ -470,6 +474,19 @@ has_python3() {
 
 has_zsh() {
     if command -v zsh > /dev/null; then
+        return 0 # true
+    else
+        return 1 # false
+    fi
+}
+
+is_zsh_active() {
+    if ! has_zsh; then
+        return 1 # false
+    fi
+    ZSH_PATH=$(which zsh)
+    CURR_SHELL=$(getent passwd $USER | cut -d: -f7)
+    if [ "$CURR_SHELL" == "$ZSH_PATH" ]; then
         return 0 # true
     else
         return 1 # false
