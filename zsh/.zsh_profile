@@ -1,13 +1,21 @@
 # zsh profile/rc settings
 # protects settings from being clobbered by noob scripts
 
+if [ -f "$HOME/.zsh_util" ]; then
+    source "$HOME/.zsh_util"
+fi
+
 # TODO addd some MacOS detection
 [[ $(uname -a) =~ "Darwin" ]] && isMac=true || isMac=false
 
 CONFIG_HOME=$HOME/.config
 XDG_CONFIG_HOME=$CONFIG_HOME
 PERSONAL=$CONFIG_HOME/personal
-source $PERSONAL/env
+mkdir -p $PERSONAL
+
+if [ -f "$PERSONAL/env" ]; then
+    source "$PERSONAL/env"
+fi
 for i in `find -L $PERSONAL`; do
     source $i
 done
@@ -33,17 +41,18 @@ addToPathFront "$HOME/.local/scripts"
 ###################################
 # MacOS specific Settings
 ###################################
+if [[ $(uname -a) =~ "Darwin" ]]; then
+  # bin PATH for home-brew apps
+  addToPathFront "/opt/homebrew/bin"
 
-# bin PATH for home-brew apps
-addToPathFront "/opt/homebrew/bin"
-
-addToPathFront "/opt/homebrew/opt/coreutils/libexec/gnubin"
-addToPathFront "/opt/homebrew/opt/gnu-indent/libexec/gnubin"
-addToPathFront "/opt/homebrew/opt/gnu-tar/libexec/gnubin"
-addToPathFront "/opt/homebrew/opt/gnu-sed/libexec/gnubin"
-addToPathFront "/opt/homebrew/opt/grep/libexec/gnubin"
-addToPathFront "/opt/homebrew/opt/openssl@1.1/bin"
-addToPathFront "/opt/homebrew/opt/mysql@5.7/bin"
+  addToPathFront "/opt/homebrew/opt/coreutils/libexec/gnubin"
+  addToPathFront "/opt/homebrew/opt/gnu-indent/libexec/gnubin"
+  addToPathFront "/opt/homebrew/opt/gnu-tar/libexec/gnubin"
+  addToPathFront "/opt/homebrew/opt/gnu-sed/libexec/gnubin"
+  addToPathFront "/opt/homebrew/opt/grep/libexec/gnubin"
+  addToPathFront "/opt/homebrew/opt/openssl@1.1/bin"
+  addToPathFront "/opt/homebrew/opt/mysql@5.7/bin"
+fi
 
 
 # OSX Shortcuts

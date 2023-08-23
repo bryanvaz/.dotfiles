@@ -96,6 +96,7 @@ run_stash() {
     cp -r "${HOME}/.zshrc" "${ZSH_BACKUP}/.zshrc"
     cp -r "${HOME}/.zsh_profile" "${ZSH_BACKUP}/.zsh_profile"
     cp -r "${HOME}/.zprofile" "${ZSH_BACKUP}/.zprofile"
+    cp -r "${HOME}/.zsh_util" "${ZSH_BACKUP}/.zsh_util"
     cp -r "${HOME}/.p10k.zsh" "${ZSH_BACKUP}/.p10k.zsh"
 
     # Backup banner
@@ -133,6 +134,7 @@ run_restore() {
     cp -r "${ZSH_BACKUP}/.zshrc" "${HOME}/.zshrc"
     cp -r "${ZSH_BACKUP}/.zsh_profile" "${HOME}/.zsh_profile"
     cp -r "${ZSH_BACKUP}/.zprofile" "${HOME}/.zprofile"
+    cp -r "${ZSH_BACKUP}/.zsh_util" "${HOME}/.zsh_util"
     cp -r "${ZSH_BACKUP}/.p10k.zsh" "${HOME}/.p10k.zsh"
 
     # Restore banner
