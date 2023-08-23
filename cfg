@@ -273,7 +273,6 @@ install_debian() {
         if [ "$res_char" == "y" ]; then
             echo -e "Installing Docker..."
 
-
             echo -e "Setup docker group for non-root access? (recommended)"
             read -n 1 -p "Setup docker group? (y/n)" res_char
             echo -e " "
