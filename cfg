@@ -43,6 +43,7 @@ APT_PACKAGES=(
     gawk
     software-properties-common
     zsh
+    fd-find
 )
 
 # List of mac packages to install
@@ -207,7 +208,38 @@ install_debian() {
     echo -e " "
     if [ "$res_char" == "y" ]; then
         sudo apt-get install -y "${APT_PACKAGES[@]}"
+        echo -e "checking for fd-find being correctly symlinked"
+        if command -v fdfind > /dev/null; then
+            LINK_PATH="/usr/local/bin/fd"
+            if [ -L "$LINK_PATH" ]; then
+                TARGET_PATH=$(readlink "$LINK_PATH")
+                if [ "$TARGET_PATH" == "$(which fdfind)" ]; then
+                    echo "fd-find correctly symlinked to $LINK_PATH"
+                else
+                    echo "fd at '$LINK_PATH' is not linked to fdfind at $(which fdfind). It is linked to '$TARGET_PATH'"
+                    echo "Do you want to relink?"
+                    read -n 1 -p "Relink fd-find? (y/n)" res_char
+                    echo -e " "
+                    if [ "$res_char" == "y" ]; then
+                        rm -f $LINK_PATH
+                        sudo ln -sf $(which fdfind) $LINK_PATH
+                    fi                    
+                fi
+            else
+                echo "fd at '$LINK_PATH' is not a symlink"
+                echo "Do you want to symlink?"
+                read -n 1 -p "Symlink fd-find? (y/n)" res_char
+                echo -e " "
+                if [ "$res_char" == "y" ]; then
+                    if [ -f "$LINK_PATH" ]; then
+                        rm -f $LINK_PATH
+                    fi
+                    sudo ln -sf $(which fdfind) $LINK_PATH
+                fi
+            fi
+        fi
         echo -e "******* base packages installed *******\n"
+
     fi
 
     if ! has_zsh; then
@@ -240,9 +272,6 @@ install_debian() {
     else
         # Install neovim
         echo -e "Installing Neovim from nightly (gotta do nightly, sorry)..."
-        # mkdir -p /tmp/nvim
-        # wget -O /tmp/nvim-linux64.tar.gz https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz
-        # tar -xzf /tmp/nvim-linux64.tar.gz -C /tmp/nvim
         wget -O /tmp/nvim.appimage https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage
         sudo mkdir -p /usr/local/lib/neovim
         sudo mv /tmp/nvim.appimage /usr/local/lib/neovim/nvim.appimage
@@ -250,8 +279,15 @@ install_debian() {
         sudo ln -s /usr/local/lib/neovim/nvim /usr/local/bin/nvim
         echo -e "******* Neovim installed! *******\n"
     fi
+    echo -e "Installing Neovim plugin dependencies..."
+    if command -v rg > /dev/null; then
+        echo -e "* ripgrep found."
+    else
+        echo -e "* Installing ripgrep for telescope..."
+        wget -O /tmp/ripgrep_13.0.0_amd64.deb https://github.com/BurntSushi/ripgrep/releases/download/13.0.0/ripgrep_13.0.0_amd64.deb
+        sudo dpkg -i /tmp/ripgrep_13.0.0_amd64.deb
+    fi
 
-    
 
     # Install gh
     if has_gh; then
