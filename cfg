@@ -286,21 +286,27 @@ install_debian() {
                 else
                     sudo groupadd docker
                 fi
+                echo "adding user to docker..."
                 sudo usermod -aG docker $USER
-                newgrp docker
-                echo -e "******* Docker group setup! *******\n"
+                # newgrp docker
+                echo -e "******* Docker group setup complete! *******\n"
             fi
-
+            echo -e "Cleansing any traces of previous docker installs, if present..."
             sudo apt-get remove docker docker-engine docker.io containerd runc
+            echo -e "\nInstalling docker repo prereqs..."
             sudo apt-get update
-            sudo apt-get install \
+            sudo apt-get -y install \
                 apt-transport-https \
                 ca-certificates \
                 curl \
                 gnupg \
                 lsb-release
-            sudo install -m 0755 -d /etc/apt/keyrings
 
+            echo -e "\nInstalling docker repo keyring..."
+            sudo install -m 0755 -d /etc/apt/keyrings
+            if [ -e /etc/apt/keyrings/docker.gpg ]; then
+                sudo mv /etc/apt/keyrings/docker.gpg /etc/apt/keyrings/docker.gpg.bak
+            fi
             if [ "$DISTRO" == "ubuntu" ]; then
                 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
             elif [ "$DISTRO" == "debian" ]; then
@@ -308,9 +314,7 @@ install_debian() {
             else
                 curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
             fi
-
             sudo chmod a+r /etc/apt/keyrings/docker.gpg
-
 
             if [ "$DISTRO" == "ubuntu" ]; then
                 echo \
@@ -329,8 +333,10 @@ install_debian() {
                     sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
             fi
 
+            echo -e "\nRefreshing APT with docker repo data..."
             sudo apt-get update
-            sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+            echo -e "\nInstalling docker..."
+            sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
             echo -e "******* Docker installed! *******\n"
         fi
     fi
@@ -350,7 +356,7 @@ install_debian() {
             sudo mkdir -p /usr/local/lib/figurine
             sudo mv /tmp/figurine/deploy/rainbow /usr/local/lib/figurine/rainbow
             sudo chmod 755 /usr/local/lib/figurine/rainbow
-            ln -s /usr/local/lib/figurine/rainbow /usr/local/bin/lolcat
+            sudo ln -s /usr/local/lib/figurine/rainbow /usr/local/bin/lolcat
             echo -e "******* lolcat installed! *******\n"
         fi
     fi
