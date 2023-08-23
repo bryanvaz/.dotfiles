@@ -9,7 +9,7 @@ fi
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="/Users/bryan/.oh-my-zsh"
+export ZSH="$HOME/.oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -114,4 +114,4 @@ source ~/.zsh_profile
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # opam configuration
-[[ ! -r /Users/bryan/.opam/opam-init/init.zsh ]] || source /Users/bryan/.opam/opam-init/init.zsh  > /dev/null 2> /dev/null
+[[ ! -r "$HOME/.opam/opam-init/init.zsh" ]] || source $HOME/.opam/opam-init/init.zsh  > /dev/null 2> /dev/null

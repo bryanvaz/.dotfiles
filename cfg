@@ -86,7 +86,7 @@ run_stash() {
         if [ -d "${CONFIG_HOME}/${config_backup_dir}" ]; then
             echo -e "Backing up ${config_backup_dir} config..."
             mkdir -p "${CONFIG_BACKUP}/${config_backup_dir}"
-            cp -r "${CONFIG_HOME}/${config_backup_dir}/" "${CONFIG_BACKUP}/${config_backup_dir}/"
+            cp -r "${CONFIG_HOME}/${config_backup_dir}" "${CONFIG_BACKUP}/"
         fi
     done
 
@@ -96,6 +96,7 @@ run_stash() {
     cp -r "${HOME}/.zshrc" "${ZSH_BACKUP}/.zshrc"
     cp -r "${HOME}/.zsh_profile" "${ZSH_BACKUP}/.zsh_profile"
     cp -r "${HOME}/.zprofile" "${ZSH_BACKUP}/.zprofile"
+    cp -r "${HOME}/.p10k.zsh" "${ZSH_BACKUP}/.p10k.zsh"
 
     # Backup banner
     echo -e "Backing up banner..."
@@ -113,8 +114,8 @@ run_stash() {
 
     # backup scritps
     echo -e "Backing up scripts..."
-    mkdir -p "${LOCAL_BACKUP}/scripts"
-    cp -r "${HOME}/.local/scripts/" "${LOCAL_BACKUP}/scripts/"
+    # mkdir -p "${LOCAL_BACKUP}/scripts"
+    cp -r "${HOME}/.local/scripts" "${LOCAL_BACKUP}/"
 }
 
 run_restore() {
@@ -132,6 +133,7 @@ run_restore() {
     cp -r "${ZSH_BACKUP}/.zshrc" "${HOME}/.zshrc"
     cp -r "${ZSH_BACKUP}/.zsh_profile" "${HOME}/.zsh_profile"
     cp -r "${ZSH_BACKUP}/.zprofile" "${HOME}/.zprofile"
+    cp -r "${ZSH_BACKUP}/.p10k.zsh" "${HOME}/.p10k.zsh"
 
     # Restore banner
     echo -e "Restoring banner..."
@@ -149,7 +151,7 @@ run_restore() {
     # Restore scripts
     echo -e "Restoring scripts..."
     mkdir -p "${HOME}/.local/scripts"
-    cp -r "${LOCAL_BACKUP}/scripts/" "${HOME}/.local/scripts/"
+    cp -r "${LOCAL_BACKUP}/scripts" "${HOME}/.local/"
 
     echo -e "Restoring complete!"
     echo -e "Run \`cfg install\` to install packages"
@@ -222,7 +224,8 @@ install_debian() {
             echo -e "oh-my-zsh already installed! Skipping..."
         else
             echo -e "Installing oh-my-zsh..."
-            sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+            rm -Rf $HOME/.oh-my-zsh
+            ZSH= RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
             echo -e "******* oh-my-zsh installed! *******\n"
         fi
         install_zsh_theme
@@ -500,7 +503,7 @@ is_zsh_active() {
 }
 
 has_oh_my_zsh() {
-    if [ -d "${HOME}/.oh-my-zsh" ]; then
+    if [ -d "${HOME}/.oh-my-zsh" ] && [ -f "${HOME}/.oh-my-zsh/oh-my-zsh.sh" ]; then
         return 0 # true
     else
         return 1 # false
