@@ -35,6 +35,7 @@ export GIT_EDITOR=$VIM
 export DOTFILES=$HOME/.dotfiles
 
 addToPathFront "$GOPATH/bin"
+addToPathFront "$GOROOT/bin"
 # Personal Scripts
 addToPathFront "$HOME/.local/scripts"
 

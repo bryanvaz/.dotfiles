@@ -413,7 +413,21 @@ install_debian() {
     # Install nvm
     echo -e "TODO: Install nvm and node"
 
-    echo -e "TODO: Install golang"
+    if command -v go > /dev/null; then
+        echo -e "go already installed! Skipping..."
+    else
+        echo -e "Install golang? (recommended)"
+        read -n 1 -p "Install golang? (y/n)" res_char
+        echo -e " "
+        if [ "$res_char" == "y" ]; then
+            echo -e "Installing go..."
+            wget -O /tmp/go1.21.0.linux-amd64.tar.gz https://go.dev/dl/go1.21.0.linux-amd64.tar.gz
+            sudo rm -rf /usr/local/go
+            sudo tar -C /usr/local -xzf /tmp/go1.21.0.linux-amd64.tar.gz
+            echo -e "******* go installed! *******\n"
+        fi
+    fi
+    
 
     echo -e "TODO: Install ocaml"
 
