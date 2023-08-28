@@ -44,6 +44,8 @@ APT_PACKAGES=(
     software-properties-common
     zsh
     fd-find
+    sysstat
+    iotop
 )
 
 # List of mac packages to install
@@ -425,9 +427,28 @@ install_debian() {
             sudo rm -rf /usr/local/go
             sudo tar -C /usr/local -xzf /tmp/go1.21.0.linux-amd64.tar.gz
             echo -e "******* go installed! *******\n"
+            go install -v golang.org/x/tools/cmd/goimports@latest
+            go install -v honnef.co/go/tools/cmd/staticcheck@latest
+            go install -v golang.org/x/tools/gopls@latest
+            go install -v github.com/go-delve/delve/cmd/dlv@latest
+            go install -v github.com/stamblerre/gocode@v1.0.0
         fi
     fi
     
+
+    # Install poetry
+    if command -v poetry > /dev/null; then
+        echo -e "poetry already installed! Skipping..."
+    else
+        echo -e "Install poetry (python package manager)? (recommended)"
+        read -n 1 -p "Install poetry? (y/n)" res_char
+        echo -e " "
+        if [ "$res_char" == "y" ]; then
+            echo -e "Installing poetry..."
+            curl -sSL https://install.python-poetry.org | python3 -
+            echo -e "******* poetry installed! *******\n"
+        fi
+    fi
 
     echo -e "TODO: Install ocaml"
 
