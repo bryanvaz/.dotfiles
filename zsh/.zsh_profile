@@ -29,6 +29,7 @@ export NVM_DIR="$HOME/.nvm"
 
 # Poetry and other stuff
 addToPathFront "$HOME/.local/bin"
+export PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring
 
 #Go
 export GOROOT='/usr/local/go'
