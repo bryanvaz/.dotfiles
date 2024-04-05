@@ -3,8 +3,8 @@ function ActivateRosePine(color)
 	color = color or "rose-pine"
 	vim.cmd.colorscheme(color)
 
-	vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-	vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+	-- vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+	-- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
 
 end
 
@@ -12,16 +12,10 @@ end
 
 -- Catppuchinn custom
 function ActivateCatppuccinCustom(color)
-	-- color = color or "catppuccin"
-	-- vim.cmd.colorscheme(color)
-
-	-- vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-	-- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
-
     require("catppuccin").setup {
 		flavor = "mocha",
 		term_colors = false,
-		transparent_background = true,
+		-- transparent_background = true,
 		styles = {
 			comments = {},
 			conditionals = {},
@@ -69,14 +63,11 @@ function ActivateCatppuccinCustom(color)
 			},
         },
     }
-
     color = color or "catppuccin"
 	vim.cmd.colorscheme(color)
-
-
 end
 
-ActivateCatppuccinCustom(color)
+-- ActivateCatppuccinCustom(color)
 
 function AuraColor(color) 
 	color = color or "aura-dark"
@@ -84,3 +75,19 @@ function AuraColor(color)
 end
 
 -- AuraColor(color)
+
+function ActivateTokyo(style)
+    require("tokyonight").setup {
+        style = style or "night",
+        transparent = true,
+        italic_comments = true,
+        -- dark_sidebar = true,
+        -- dark_float = true,
+        -- sidebars = { "qf", "vista_kind", "terminal", "packer" },
+        -- colors = { hint = "orange", error = "#ff0000" },
+    }
+    color = color or "tokyonight"
+    vim.cmd.colorscheme(color)
+end
+
+ActivateTokyo()

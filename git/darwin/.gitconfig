@@ -1,6 +1,7 @@
 [user]
 	email = bryan.git@vaz.sh
 	name = Bryan Vaz
+	signingkey = B869620CAF5FE4493195EBB5710E55C3815AD974
 [core]
 	editor = nano
 	excludesfile = /Users/bryan/.gitignore_global
@@ -12,3 +13,5 @@
 	trustExitCode = true
 [alias]
 	tree = log --oneline --graph --decorate --all
+[commit]
+	gpgsign = true

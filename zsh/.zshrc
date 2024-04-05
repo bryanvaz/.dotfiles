@@ -115,3 +115,8 @@ source ~/.zsh_profile
 
 # opam configuration
 [[ ! -r "$HOME/.opam/opam-init/init.zsh" ]] || source $HOME/.opam/opam-init/init.zsh  > /dev/null 2> /dev/null
+
+[[ -s "/Users/bryan/.gvm/scripts/gvm" ]] && source "/Users/bryan/.gvm/scripts/gvm"
+
+# Created by `pipx` on 2023-12-15 22:34:04
+export PATH="$PATH:/Users/bryan/.local/bin"

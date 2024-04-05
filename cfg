@@ -51,6 +51,12 @@ APT_PACKAGES=(
 # List of mac packages to install
 HOMEBREW_PACKAGES=(
     git
+    fastfetch
+    gh
+    jq
+    coreutils
+    wget
+    httpie
 )
 
 # List of directories to be stashed

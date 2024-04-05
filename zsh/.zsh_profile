@@ -27,21 +27,19 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-# Poetry and other stuff
-addToPathFront "$HOME/.local/bin"
-export PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring
-
 #Go
-export GOROOT='/usr/local/go'
+[[ -s "/Users/bryan/.gvm/scripts/gvm" ]] && source "/Users/bryan/.gvm/scripts/gvm"
+#export GOROOT='/usr/local/go'
 export GOPATH=$HOME/code/go
+export GOROOT_BOOTSTRAP=$GOROOT
 
 export GIT_EDITOR=$VIM
 export DOTFILES=$HOME/.dotfiles
 
 addToPathFront "$GOPATH/bin"
-addToPathFront "$GOROOT/bin"
 # Personal Scripts
 addToPathFront "$HOME/.local/scripts"
+addToPathFront "$HOME/.local/bin"
 
 ###################################
 # MacOS specific Settings

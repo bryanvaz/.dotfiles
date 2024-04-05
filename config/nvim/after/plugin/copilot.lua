@@ -1,0 +1,18 @@
+-- See lsp.lua
+
+-- require('copilot').setup({
+--     suggestion = { enabled = false },
+--     panel = { enabled = false },
+--     -- suggestion = {
+--     --     enable = true,
+--     --     auto_trigger = true, -- This will automatically trigger the suggestion box when typing.
+--     --     keymap = {
+--     --         accept = "<C-y>",
+--     --         -- accept_word = false,
+--     --         -- accept_line = false,
+--     --         -- next = "<M-]>",
+--     --         -- prev = "<M-[>",
+--     --         dismiss = "<C-]>",
+--     --     },
+--     -- },
+-- })
