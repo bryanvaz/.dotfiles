@@ -193,23 +193,23 @@ install_debian() {
         fi
     fi
 
-    # Install lolcat
-    if command -v lolcat > /dev/null; then
-        echo -e "lolcat already installed! Skipping..."
+    # Install rainbow
+    if command -v rainbow > /dev/null; then
+        echo -e "rainbow already installed! Skipping..."
     else
-        echo -e "Install lolcat? (recommended)"
-        read -n 1 -p "Install lolcat? (y/n)" res_char
+        echo -e "Install rainbow? (recommended)"
+        read -n 1 -p "Install rainbow? (y/n)" res_char
         echo -e " "
         if [ "$res_char" == "y" ]; then
-            echo -e "Installing lolcat..."
+            echo -e "Installing rainbow..."
             wget -O /tmp/figurine_linux_v1.2.1.tar.gz https://github.com/arsham/rainbow/releases/download/v1.2.1/figurine_linux_v1.2.1.tar.gz
             mkdir -p /tmp/figurine
             tar -xzf /tmp/figurine_linux_v1.2.1.tar.gz -C /tmp/figurine
             sudo mkdir -p /usr/local/lib/figurine
             sudo mv /tmp/figurine/deploy/rainbow /usr/local/lib/figurine/rainbow
             sudo chmod 755 /usr/local/lib/figurine/rainbow
-            sudo ln -s /usr/local/lib/figurine/rainbow /usr/local/bin/lolcat
-            echo -e "******* lolcat installed! *******\n"
+            sudo ln -s /usr/local/lib/figurine/rainbow /usr/local/bin/rainbow
+            echo -e "******* rainbow installed! *******\n"
         fi
     fi
 

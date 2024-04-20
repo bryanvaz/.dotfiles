@@ -63,8 +63,15 @@ HOMEBREW_PACKAGES=(
     gh
     jq
     coreutils
+    make
+    gnu-tar
+    gnu-sed
+    gawk
+    grep
+    findutils
     wget
     httpie
     gnupg
+    pinentry-mac
     tree
 )
