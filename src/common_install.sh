@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 install_zsh_theme() {
-    REQUIRED_THEME=$(grep '^ZSH_THEME=\"' $DIR/zsh/.zshrc | awk -F'"' '{print $2}')
+    REQUIRED_THEME=$(grep '^ZSH_THEME="' $DIR/zsh/.zshrc | awk -F'"' '{print $2}')
     if [ "$REQUIRED_THEME" == "powerlevel10k/powerlevel10k" ]; then 
         if [ -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" ]; then
             echo -e "$GREEN_CHECK ZSH theme ${REQUIRED_THEME} already installed!"

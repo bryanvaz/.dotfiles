@@ -74,4 +74,5 @@ HOMEBREW_PACKAGES=(
     gnupg
     pinentry-mac
     tree
+    # stats
 )
