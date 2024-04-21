@@ -120,3 +120,4 @@ source ~/.zsh_profile
 
 # Created by `pipx` on 2023-12-15 22:34:04
 export PATH="$PATH:/Users/bryan/.local/bin"
+

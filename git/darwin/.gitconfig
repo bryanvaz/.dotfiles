@@ -3,7 +3,7 @@
 	name = Bryan Vaz
 	signingkey = B869620CAF5FE4493195EBB5710E55C3815AD974
 [core]
-	editor = nano
+	editor = nvim
 	excludesfile = /Users/bryan/.gitignore_global
 [difftool "sourcetree"]
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"

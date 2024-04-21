@@ -75,4 +75,5 @@ HOMEBREW_PACKAGES=(
     pinentry-mac
     tree
     # stats
+    # jesseduffield/lazygit/lazygit
 )

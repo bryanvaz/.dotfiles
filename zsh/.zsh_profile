@@ -30,7 +30,7 @@ export NVM_DIR="$HOME/.nvm"
 #Go
 [[ -s "/Users/bryan/.gvm/scripts/gvm" ]] && source "/Users/bryan/.gvm/scripts/gvm"
 #export GOROOT='/usr/local/go'
-export GOPATH=$HOME/code/go
+#export GOPATH=$HOME/code/go
 export GOROOT_BOOTSTRAP=$GOROOT
 
 export GIT_EDITOR=$VIM
@@ -54,7 +54,9 @@ if [[ $(uname -a) =~ "Darwin" ]]; then
   addToPathFront "/opt/homebrew/opt/gnu-sed/libexec/gnubin"
   addToPathFront "/opt/homebrew/opt/grep/libexec/gnubin"
   addToPathFront "/opt/homebrew/opt/openssl@1.1/bin"
-  addToPathFront "/opt/homebrew/opt/mysql@5.7/bin"
+#  addToPathFront "/opt/homebrew/opt/mysql@5.7/bin"
+
+  addToPathFront "$HOME/.docker/bin"
 fi
 
 
@@ -82,11 +84,11 @@ alias gl='git log --oneline --graph --decorate --all' # should be also in .gitco
 alias nightly='git checkout nightly'
 
 # App shortcuts
-alias redis='redis-server /opt/homebrew/etc/redis.config'
+# alias redis='redis-server /opt/homebrew/etc/redis.config'
 
 # Banner message
 # Instant prompt angry, color not working, fix later
-echo "$(cat $HOME/.banner)" | lolcat
+echo "$(cat $HOME/.banner)" | rainbow
 
 ###################################
 # Customization of Spaceship theme
