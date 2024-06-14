@@ -93,12 +93,13 @@ install_mac() {
         echo -e "$GREEN_CHECK Neovim already installed!"
     else
         echo -e "$BLUE_ARROW downloading neovim..."
-        curl -L https://github.com/neovim/neovim/releases/latest/download/nvim-macos.tar.gz -o /tmp/nvim-macos-x86_64.tar.gz
+        curl -L https://github.com/neovim/neovim/releases/download/stable/nvim-macos-arm64.tar.gz \
+            -o /tmp/nvim-macos-arm64.tar.gz
         echo -e "$BLUE_ARROW unpacking neovim..."
-        tar -xzf /tmp/nvim-macos-x86_64.tar.gz -C /tmp
+        tar -xzf /tmp/nvim-macos-arm64.tar.gz -C /tmp
         echo -e "$BLUE_ARROW installing neovim..."
         sudo mkdir -p /usr/local/lib/nvim
-        sudo cp -R /tmp/nvim-macos/* /usr/local/lib/nvim
+        sudo cp -R /tmp/nvim-macos-arm64/* /usr/local/lib/nvim
         sudo ln -s /usr/local/lib/nvim/bin/nvim /usr/local/bin/nvim
         echo -e "$GREEN_CHECK Neovim installed!"
     fi

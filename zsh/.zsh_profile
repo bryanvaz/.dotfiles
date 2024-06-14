@@ -75,6 +75,9 @@ if ! type "which nvim" > /dev/null; then
   alias vim=nvim
 fi
 
+# Nav shortcuts
+alias code='cd ~/code/'
+
 # Additional Git Shortcuts
 alias nb='git checkout -b'
 alias gc='git commit -v -m'

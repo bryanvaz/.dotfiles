@@ -4,10 +4,13 @@ local harpoon = require("harpoon")
 harpoon:setup()
 -- REQUIRED
 
-vim.keymap.set("n", "<C-p>", function() 
-    harpoon:list():append() 
-    print("File added to harpoon!")
-end)
+vim.keymap.set("n", "<C-p>", 
+    function() 
+        harpoon:list():append() 
+        print("File added to harpoon!")
+    end,
+    { desc = "Add new harpoon mark" }
+)
 -- vim.keymap.set("n", "<leader>a", function() harpoon:list():append() end)
 -- vim.keymap.set("n", "<C-e>", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
 
@@ -21,8 +24,10 @@ vim.keymap.set("n", "<C-;>", function() harpoon:list():select(4) end,
     { desc = "Harpoon to Mark 4" })
 
 -- Toggle previous & next buffers stored within Harpoon list
-vim.keymap.set("n", "<C-S-P>", function() harpoon:list():prev() end)
-vim.keymap.set("n", "<C-S-N>", function() harpoon:list():next() end)
+vim.keymap.set("n", "<C-S-P>", function() harpoon:list():prev() end,
+    { desc = "Prev buffer in harpoon" })
+vim.keymap.set("n", "<C-S-N>", function() harpoon:list():next() end,
+    { desc = "Next buffer in harpoon" })
 
 
 
@@ -122,7 +127,8 @@ local function toggle_telescope(harpoon_files)
 
                 curr_picker:delete_selection(function(selection)
                     harpoon:list():removeAt(selection.index)
-                end)
+                end,
+                { desc = "Delete entry from harpoon list" })
             end)
             -- Move entries up and down with <C-j> and <C-k>
             -- Change the keybinding to your liking
@@ -130,13 +136,15 @@ local function toggle_telescope(harpoon_files)
                 '<C-j>',
                 function(prompt_bufnr)
                     move_mark_down(prompt_bufnr, harpoon_files)
-                end
+                end,
+                { desc = "Move entry down in harpoon list" }
             )
             map({ 'n', 'i' },
                 '<C-k>',
                 function(prompt_bufnr)
                     move_mark_up(prompt_bufnr, harpoon_files)
-                end
+                end,
+                { desc = "Move entry up in harpoon list" }
             )
 
             return true

@@ -16,11 +16,17 @@ return {
                     "heex",
                     "javascript",
                     "html",
-                    "templ",
+                    -- Go Lang features should be handled
+                    -- by ray-x/go.nvim
+                    "go",
+                    -- "gotempl", -- for go template
+                    "templ", -- for templ
+                    "toml",
+                    "sql",
                 },
                 sync_install = false,
                 highlight = { enable = true },
-                indent = { enable = true }, 
+                indent = { enable = true },
             })
         end
     },
