@@ -8,10 +8,10 @@ require('lualine').setup({
     sections = {
         lualine_c = {
             'filename',
-            {
-                'buffers',
-                mode = 2,
-            },
+            -- {
+            --     'buffers',
+            --     mode = 2,
+            -- },
         },
     },
 })

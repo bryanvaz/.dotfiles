@@ -8,7 +8,7 @@ local builtin = require('telescope.builtin')
 -- Search
 vim.keymap.set('n', '<leader>pw',
     function()
-	    builtin.grep_string({ 
+	    builtin.grep_string({
             word_match = "-w",
             short_path = true,
             only_sort_text = true,
@@ -18,7 +18,7 @@ vim.keymap.set('n', '<leader>pw',
     { desc = "Telescope grep search word" }
 )
 vim.keymap.set('n', '<leader>ps', function()
-	builtin.live_grep({ 
+	builtin.live_grep({
         -- word_match = "-w",
         -- short_path = true,
         -- only_sort_text = true,
@@ -37,8 +37,9 @@ end,
 -- Files
 vim.keymap.set('n', "<leader>pg", builtin.git_files, {desc = "telescope git files"})
 -- vim.keymap.set('n', "<leader>pg", builtin.multi_rg, {})
-vim.keymap.set('n', "<leader>po", builtin.oldfiles, {})
+vim.keymap.set('n', "<leader>po", builtin.oldfiles, {desc = "telescope previously opened files"})
 vim.keymap.set('n', "<leader>pf", builtin.find_files, {desc = "telescope find files"})
+vim.keymap.set('n', "<leader>pr", builtin.buffers, {desc = "telescope buffers list"})
 -- vim.keymap.set('n', "<leader>ps", builtin.fs, {})
 -- vim.keymap.set('n', "<leader>pp", builtin.project_search, {})
 -- vim.keymap.set('n', "<leader>pv", builtin.find_nvim_source, {})
