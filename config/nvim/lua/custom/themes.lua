@@ -1,5 +1,6 @@
+local M = {}
 
-function ActivateRosePine(color)
+function M.ActivateRosePine(color)
 	color = color or "rose-pine"
 	vim.cmd.colorscheme(color)
 
@@ -11,7 +12,7 @@ end
 -- ActivateRosePine(color)
 
 -- Catppuchinn custom
-function ActivateCatppuccinCustom(color)
+function M.ActivateCatppuccinCustom(color)
     require("catppuccin").setup {
 		flavor = "mocha",
 		term_colors = false,
@@ -69,14 +70,14 @@ end
 
 -- ActivateCatppuccinCustom(color)
 
-function AuraColor(color) 
+function M.AuraColor(color) 
 	color = color or "aura-dark"
 	vim.cmd.colorscheme(color)
 end
 
 -- AuraColor(color)
 
-function ActivateTokyo(style)
+function M.ActivateTokyo(style)
     require("tokyonight").setup {
         style = style or "night",
         transparent = true,
@@ -90,4 +91,6 @@ function ActivateTokyo(style)
     vim.cmd.colorscheme(color)
 end
 
-ActivateTokyo()
+-- ActivateTokyo()
+
+return M

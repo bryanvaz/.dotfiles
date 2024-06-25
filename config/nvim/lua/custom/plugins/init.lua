@@ -3,6 +3,9 @@
 -- runs before any other plugings and don't want to play
 -- with priority
 
+-- Require the themes file
+local themes = require('custom.themes')
+
 return {
     -- Critical Preloads
     { "nvim-lua/plenary.nvim", dev = false },
@@ -26,6 +29,9 @@ return {
         lazy = false,
         priority = 1000,
         opts = {},
+        config = function()
+            themes.ActivateTokyo()  -- Call your custom function here
+        end
     },
 
     -- UI

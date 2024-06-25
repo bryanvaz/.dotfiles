@@ -6,6 +6,8 @@ run_stash() {
         if [ -d "${CONFIG_HOME}/${config_backup_dir}" ]; then
             echo -e "Backing up ${config_backup_dir} config..."
             mkdir -p "${CONFIG_BACKUP}/${config_backup_dir}"
+            rm -rf "${CONFIG_BACKUP}/${config_backup_dir}"
+            mkdir -p "${CONFIG_BACKUP}/${config_backup_dir}"
             cp -r "${CONFIG_HOME}/${config_backup_dir}" "${CONFIG_BACKUP}/"
         fi
     done
