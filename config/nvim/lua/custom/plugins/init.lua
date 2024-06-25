@@ -52,9 +52,11 @@ return {
     --                         "nvim-tree/nvim-web-devicons", -- optional dependency
     --     },
     -- },
-    { 'stevearc/oil.nvim',
-        dependencies = { "nvim-tree/nvim-web-devicons" },
-    },
+    -- Oil is disabled for now
+    -- not behaving with netrw (empty directories)
+    -- { 'stevearc/oil.nvim',
+    --     dependencies = { "nvim-tree/nvim-web-devicons" },
+    -- },
 
     -- LSP
     --- Uncomment the two plugins below if you want to manage the language servers from neovim
@@ -83,6 +85,19 @@ return {
         config = function ()
             require("copilot_cmp").setup()
         end
+    },
+    {
+        "CopilotC-Nvim/CopilotChat.nvim",
+        branch = "canary",
+        dependencies = {
+          { "zbirenbaum/copilot.lua" }, -- or github/copilot.vim
+          { "nvim-lua/plenary.nvim" }, -- for curl, log wrapper
+        },
+        opts = {
+          debug = true, -- Enable debugging
+          -- See Configuration section for rest
+        },
+        -- See Commands section for default commands if you want to lazy load on them
     },
 
 }
