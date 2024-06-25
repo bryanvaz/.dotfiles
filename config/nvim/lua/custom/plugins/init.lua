@@ -40,6 +40,21 @@ return {
     },
     { "mbbill/undotree" },
     -- see neotree.lua
+    { "akinsho/bufferline.nvim", version = "*", dependencies = "nvim-tree/nvim-web-devicons" },
+    {
+        'Bekaboo/dropbar.nvim',
+        -- optional, but required for fuzzy finder support
+        dependencies = {
+            'nvim-telescope/telescope-fzf-native.nvim'
+        }
+    },
+    -- { "utilyre/barbecue.nvim",
+    --     name = "barbecue",
+    --     version = "*",
+    --     dependencies = {    "SmiteshP/nvim-navic",
+    --                         "nvim-tree/nvim-web-devicons", -- optional dependency
+    --     },
+    -- },
 
     -- LSP
     --- Uncomment the two plugins below if you want to manage the language servers from neovim
