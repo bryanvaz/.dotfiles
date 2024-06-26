@@ -4,24 +4,27 @@ local harpoon = require("harpoon")
 harpoon:setup()
 -- REQUIRED
 
-vim.keymap.set("n", "<C-p>", 
-    function() 
-        harpoon:list():append() 
+vim.keymap.set("n", "<C-p>",
+    function()
+        harpoon:list():append()
         print("File added to harpoon!")
     end,
     { desc = "Add new harpoon mark" }
 )
 -- vim.keymap.set("n", "<leader>a", function() harpoon:list():append() end)
 -- vim.keymap.set("n", "<C-e>", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
-
-vim.keymap.set("n", "<C-j>", function() harpoon:list():select(1) end,
-    { desc = "Harpoon to Mark 1" })
-vim.keymap.set("n", "<C-k>", function() harpoon:list():select(2) end,
-    { desc = "Harpoon to Mark 2" })
-vim.keymap.set("n", "<C-l>", function() harpoon:list():select(3) end,
-    { desc = "Harpoon to Mark 3" })
-vim.keymap.set("n", "<C-;>", function() harpoon:list():select(4) end,
-    { desc = "Harpoon to Mark 4" })
+local keys = {
+    {"<C-j>", 1},
+    {"<C-k>", 2},
+    {"<C-l>", 3},
+    {"<C-;>", 4},
+}
+for _, value in ipairs(keys) do
+    for _, mode in ipairs({'n', 'x', 'i'}) do
+        vim.keymap.set(mode, value[1], function() harpoon:list():select(value[2]) end,
+            { desc = "Harpoon to Mark " .. value[2] })
+    end
+end
 
 -- Toggle previous & next buffers stored within Harpoon list
 vim.keymap.set("n", "<C-S-P>", function() harpoon:list():prev() end,
@@ -112,23 +115,39 @@ local function toggle_telescope(harpoon_files)
         table.insert(file_paths, item.value)
     end
 
+    local finder = function()
+        local paths = {}
+        for _, item in ipairs(harpoon_files.items) do
+            table.insert(paths, item.value)
+        end
+
+        return require("telescope.finders").new_table({
+            results = paths,
+        })
+    end
+
     require("telescope.pickers").new({}, {
         prompt_title = "Harpoon",
-        finder = require("telescope.finders").new_table({
-            results = file_paths,
-        }),
+        finder = finder(),
         previewer = conf.file_previewer({}),
         sorter = conf.generic_sorter({}),
         attach_mappings = function(_, map)
             -- Delete entries in insert mode from harpoon list with <C-d>
             -- Change the keybinding to your liking
             map({ 'n', 'i' }, '<C-d>', function(prompt_bufnr)
-                local curr_picker = action_state.get_current_picker(prompt_bufnr)
+                local state = require("telescope.actions.state")
+                local selected_entry = state.get_selected_entry()
+                local current_picker = state.get_current_picker(prompt_bufnr)
 
-                curr_picker:delete_selection(function(selection)
-                    harpoon:list():removeAt(selection.index)
-                end,
-                { desc = "Delete entry from harpoon list" })
+                table.remove(harpoon_files.items, selected_entry.index)
+                current_picker:refresh(finder())
+
+                -- local curr_picker = action_state.get_current_picker(prompt_bufnr)
+
+                -- curr_picker:delete_selection(function(selection)
+                --     harpoon:list():removeAt(selection.index)
+                -- end,
+                -- { desc = "Delete entry from harpoon list" })
             end)
             -- Move entries up and down with <C-j> and <C-k>
             -- Change the keybinding to your liking

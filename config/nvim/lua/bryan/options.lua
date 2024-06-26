@@ -31,3 +31,7 @@ vim.opt.updatetime = 50
 
 vim.opt.colorcolumn = "80"
 
+-- ignroe case when searching
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
+

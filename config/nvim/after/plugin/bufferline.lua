@@ -39,8 +39,12 @@ function ActivateBufferLine()
       },
     })
 
-    vim.keymap.set('n', "_", function() bufferline.cycle(-1) end, {desc = "cycle bufferline backwards"})
-    vim.keymap.set('n', "+", function() bufferline.cycle(1) end, {desc = "cycle bufferline forwards"})
+    vim.keymap.set('n', "<C-9>", function() bufferline.cycle(-1) end, {desc = "cycle bufferline backwards"})
+    vim.keymap.set('x', "<C-9>", function() bufferline.cycle(-1) end, {desc = "cycle bufferline backwards"})
+    vim.keymap.set('i', "<C-9>", function() bufferline.cycle(-1) end, {desc = "cycle bufferline backwards"})
+    vim.keymap.set('n', "<C-0>", function() bufferline.cycle(1) end, {desc = "cycle bufferline forwards"})
+    vim.keymap.set('x', "<C-0>", function() bufferline.cycle(1) end, {desc = "cycle bufferline forwards"})
+    vim.keymap.set('i', "<C-0>", function() bufferline.cycle(1) end, {desc = "cycle bufferline forwards"})
     -- vim.keymap.set('n', "<C-w>", ":bdelete<CR>", {desc = "delete buffer"})
 end
 
