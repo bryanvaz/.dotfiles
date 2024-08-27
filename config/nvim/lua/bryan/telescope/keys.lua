@@ -1,4 +1,3 @@
-
 local builtin = require('telescope.builtin')
 -- vim.keymap.set('n', '<leader>pf', builtin.find_files, {})
 -- vim.keymap.set('n', '<C-p>', builtin.git_files, {})
@@ -39,7 +38,21 @@ vim.keymap.set('n', "<leader>pg", builtin.git_files, {desc = "telescope git file
 -- vim.keymap.set('n', "<leader>pg", builtin.multi_rg, {})
 vim.keymap.set('n', "<leader>po", builtin.oldfiles, {desc = "telescope previously opened files"})
 vim.keymap.set('n', "<leader>pf", builtin.find_files, {desc = "telescope find files"})
-vim.keymap.set('n', "<leader>pr", builtin.buffers, {desc = "telescope buffers list"})
+-- vim.keymap.set('n', "<leader>pr",  function()
+--     builtin.buffers({}); 
+-- end,
+--     {desc = "telescope buffers list"}
+-- )
+vim.keymap.set('n', "<leader>pr", function()
+    builtin.buffers({
+        attach_mappings = function(_, map)
+            local actions = require('telescope.actions')
+            map({ "i", "n" }, "<C-d>", actions.delete_buffer)
+            return true
+        end,
+    })
+end, { desc = "telescope buffers list" })
+
 -- vim.keymap.set('n', "<leader>ps", builtin.fs, {})
 -- vim.keymap.set('n', "<leader>pp", builtin.project_search, {})
 -- vim.keymap.set('n', "<leader>pv", builtin.find_nvim_source, {})
