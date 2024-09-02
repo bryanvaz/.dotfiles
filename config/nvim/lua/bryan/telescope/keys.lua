@@ -52,6 +52,8 @@ vim.keymap.set('n', "<leader>pr", function()
         end,
     })
 end, { desc = "telescope buffers list" })
+vim.keymap.set('n', "<leader>pe", builtin.diagnostics, {desc = "telescope lsp diagnostics"})
+vim.keymap.set('n', "<leader>pc", builtin.lsp_references, {desc = "telescope lsp implementations"})
 
 -- vim.keymap.set('n', "<leader>ps", builtin.fs, {})
 -- vim.keymap.set('n', "<leader>pp", builtin.project_search, {})
