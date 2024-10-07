@@ -14,10 +14,10 @@ vim.keymap.set("n", "<C-p>",
 -- vim.keymap.set("n", "<leader>a", function() harpoon:list():append() end)
 -- vim.keymap.set("n", "<C-e>", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
 local keys = {
-    {"<C-j>", 1},
-    {"<C-k>", 2},
-    {"<C-l>", 3},
-    {"<C-;>", 4},
+    {"<C-h>", 1},
+    {"<C-j>", 2},
+    {"<C-k>", 3},
+    {"<C-l>", 4},
 }
 for _, value in ipairs(keys) do
     for _, mode in ipairs({'n', 'x', 'i'}) do

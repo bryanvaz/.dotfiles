@@ -1,8 +1,6 @@
 
 local chat = require('CopilotChat')
 
-
-
 local function toggle_chat()
     chat.toggle({
         window = {

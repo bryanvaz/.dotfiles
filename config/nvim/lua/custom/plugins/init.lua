@@ -62,6 +62,17 @@ return {
     -- { 'stevearc/oil.nvim',
     --     dependencies = { "nvim-tree/nvim-web-devicons" },
     -- },
+    { 'fedepujol/move.nvim', opts = {} },
+    {
+        "kylechui/nvim-surround",
+        version = "*", -- Use for stability; omit to use `main` branch for the latest features
+        event = "VeryLazy",
+        -- config = function()
+        --     require("nvim-surround").setup({
+        --         -- Configuration here, or leave empty to use defaults
+        --     })
+        -- end
+    },
 
     -- LSP
     --- Uncomment the two plugins below if you want to manage the language servers from neovim
@@ -82,7 +93,7 @@ return {
     { "tamago324/cmp-zsh" },
 
     -- Copilot
-    { "zbirenbaum/copilot.lua", 
+    { "zbirenbaum/copilot.lua",
         cmd = "Copilot",
         event = "InsertEnter",
     },
@@ -104,5 +115,11 @@ return {
         },
         -- See Commands section for default commands if you want to lazy load on them
     },
-
+    {
+      "supermaven-inc/supermaven-nvim",
+      lazy = false,
+      -- config = function()
+      --   require("supermaven-nvim").setup({})
+      -- end,
+    },
 }

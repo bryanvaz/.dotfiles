@@ -7,7 +7,7 @@ require("mason").setup()
 local mason_lspconfig = require("mason-lspconfig")
 mason_lspconfig.setup {
 	ensure_installed = {
-		"tsserver",
+		-- "ts_ls",
 		"eslint",
 		"lua_ls",
 		-- "rust_analyzer",
@@ -26,8 +26,10 @@ local lspkind = require('lspkind')
 lspkind.init {
   symbol_map = {
     Copilot = "",
+    Supermaven = "",
   },
 }
+vim.api.nvim_set_hl(0, "CmpItemKindSupermaven", {fg ="#6CC644"})
 vim.api.nvim_set_hl(0, "CmpItemKindCopilot", { fg = "#6CC644" })
 
 -- Enable Copilot but delegate to cmp
@@ -37,17 +39,39 @@ require('copilot').setup({
 })
 require('copilot_cmp').setup()
 
+require("supermaven-nvim").setup({
+    disable_inline_completion = false, -- disables inline completion for use with cmp
+    disable_keymaps = false, -- disables default keymaps
+    keymaps = {
+      accept_suggestion = "<C-CR>",
+      -- clear_suggestion = "",
+      -- accept_word = "",
+    },
+    -- color = {
+    --   suggestion_color = vim.api.nvim_get_hl(0, { name = "NonText" }).fg,
+    --   cterm = vim.api.nvim_get_hl(0, { name = "NonText" }).cterm,
+    --   suggestion_group = "NonText",
+    -- },
+    -- condition = function()
+    --   -- return vim.fn.expand "%:t:r" == ".api"
+    --   return string.match(vim.fn.expand('%:t'), '.env')
+    -- end,
+    log_level = "off",
+})
+
 -- Setup cmp completions
 local cmp = require('cmp')
 local cmp_select = {behavior = cmp.SelectBehavior.Select}
 cmp.setup({
+    -- completion = {
+    --     -- completeopt = "menu,menuone,noinsert",
+    --     keyword_length = 1,
+    --     keyword_pattern = ".*",
+    -- },
     snippet = {
         -- REQUIRED - you must specify a snippet engine
         expand = function(args)
-            -- vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
             require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
-            -- require('snippy').expand_snippet(args.body) -- For `snippy` users.
-            -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
         end,
     },
     window = {
@@ -76,13 +100,14 @@ cmp.setup({
         ),
         ["<C-Space>"] = cmp.mapping.complete(),
 
-        ["<tab>"] = cmp.config.disable,
+        -- ["<tab>"] = cmp.config.disable,
     }),
     sources = cmp.config.sources({
         { name = "nvim_lua" },
         { name = "nvim_lsp" },
-        { name = "luasnip" },
+        -- { name = "supermaven" },
         { name = "copilot" },
+        { name = "luasnip" },
     }, {
         { name = "path" },
         { name = "buffer", keyword_length = 5 },
@@ -151,8 +176,9 @@ mason_lspconfig.setup {
 
 
 vim.api.nvim_create_autocmd("BufWritePre", {
-    pattern = "*.go",
+    pattern = {"*.go", "*.templ"},
     callback = function()
         vim.lsp.buf.format(nil, 1000)
     end,
 })
+-- vim.api.nvim_create_autocmd({ "BufWritePre" }, { pattern = { "*.templ" }, callback = vim.lsp.buf.format })
