@@ -17,6 +17,7 @@ mason_lspconfig.setup {
         -- "volar",
         -- "tailwindcss",
         "pyright",
+        "zls",
 	},
 }
 
@@ -52,11 +53,18 @@ require("supermaven-nvim").setup({
     --   cterm = vim.api.nvim_get_hl(0, { name = "NonText" }).cterm,
     --   suggestion_group = "NonText",
     -- },
-    -- condition = function()
-    --   -- return vim.fn.expand "%:t:r" == ".api"
-    --   return string.match(vim.fn.expand('%:t'), '.env')
-    -- end,
-    log_level = "off",
+    condition = function()
+        -- return vim.fn.expand "%:t:r" == ".api"
+        -- return string.match(vim.fn.expand('%:t'), '.env')
+        if string.match(vim.fn.expand('%:t'), '.env') then
+            return true
+        end
+        if string.match(vim.fn.expand('%:p'), '/tmp/') then
+            return true
+        end
+        return false
+    end,
+    log_level = "info",
 })
 
 -- Setup cmp completions
@@ -105,7 +113,7 @@ cmp.setup({
     sources = cmp.config.sources({
         { name = "nvim_lua" },
         { name = "nvim_lsp" },
-        -- { name = "supermaven" },
+        { name = "supermaven" },
         { name = "copilot" },
         { name = "luasnip" },
     }, {
@@ -176,7 +184,8 @@ mason_lspconfig.setup {
 
 
 vim.api.nvim_create_autocmd("BufWritePre", {
-    pattern = {"*.go", "*.templ"},
+    -- pattern = {"*.go", "*.templ"},
+    pattern = {"*.go"},
     callback = function()
         vim.lsp.buf.format(nil, 1000)
     end,

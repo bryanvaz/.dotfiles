@@ -36,5 +36,5 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 
 -- Enable spell check
-vim.opt.spell = true
+vim.opt.spell = false
 vim.spelllang = 'en_ca'

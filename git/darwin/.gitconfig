@@ -15,5 +15,6 @@
 	tree = log --oneline --graph --decorate --all
 [commit]
 	gpgSign = true
+	template = /Users/bryan/.stCommitMsg
 [init]
 	defaultBranch = main

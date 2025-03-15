@@ -1,8 +1,9 @@
 require('dropbar').setup({
     icons = {
-        kinds = {
-            use_devicons = true,
-        },
+        enable = true,
+        -- kinds = {
+        --     use_devicons = true,
+        -- },
         ui = {
             bar = {
                 separator = ' > ',
