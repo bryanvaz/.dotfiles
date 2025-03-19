@@ -1,4 +1,4 @@
-local telescope = require("telescope")
+-- local telescope = require("telescope")
 local telescopeConfig = require("telescope.config")
 
 -- Clone the default Telescope configuration
@@ -12,6 +12,8 @@ require("telescope").setup({
     defaults = {
         file_ignore_patterns = { "node_modules", ".git" },
         vimgrep_arguments = vimgrep_arguments,
+        -- log_level = vim.log.levels.TRACE, -- Set log level to DEBUG
+        -- log_file = "/Users/bryan/.local/share/nvim/telescope.log", -- Add this line
     },
     pickers = {
 		find_files = {

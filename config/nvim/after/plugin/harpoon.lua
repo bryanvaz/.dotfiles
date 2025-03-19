@@ -1,130 +1,100 @@
-local harpoon = require("harpoon")
+local harpoon = require('harpoon')
+harpoon:setup({})
 
--- REQUIRED
-harpoon:setup()
--- REQUIRED
-
-vim.keymap.set("n", "<C-p>",
-    function()
-        harpoon:list():append()
-        print("File added to harpoon!")
-    end,
-    { desc = "Add new harpoon mark" }
-)
--- vim.keymap.set("n", "<leader>a", function() harpoon:list():append() end)
+vim.keymap.set("n", "<C-p>", function()
+    harpoon:list():add()
+    print("File added to harpoon!")
+end, { desc = "Add new harpoon mark" })
 -- vim.keymap.set("n", "<C-e>", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
-local keys = {
-    {"<C-j>", 1},
-    {"<C-k>", 2},
-    {"<C-l>", 3},
-    {"<C-;>", 4},
-}
-for _, value in ipairs(keys) do
-    for _, mode in ipairs({'n', 'x', 'i'}) do
-        vim.keymap.set(mode, value[1], function() harpoon:list():select(value[2]) end,
-            { desc = "Harpoon to Mark " .. value[2] })
-    end
-end
+
+vim.keymap.set("n", "<C-j>", function() harpoon:list():select(1) end)
+vim.keymap.set("n", "<C-k>", function() harpoon:list():select(2) end)
+vim.keymap.set("n", "<C-l>", function() harpoon:list():select(3) end)
+vim.keymap.set("n", "<C-;>", function() harpoon:list():select(4) end)
+
 
 -- Toggle previous & next buffers stored within Harpoon list
-vim.keymap.set("n", "<C-S-P>", function() harpoon:list():prev() end,
+vim.keymap.set("n", "<C-S-O>", function() harpoon:list():prev() end,
     { desc = "Prev buffer in harpoon" })
-vim.keymap.set("n", "<C-S-N>", function() harpoon:list():next() end,
+vim.keymap.set("n", "<C-S-P>", function() harpoon:list():next() end,
     { desc = "Next buffer in harpoon" })
 
 
-
--- Telescope configuration
+-- Telescope Extension for Harpoon
 local conf = require("telescope.config").values
-local pickers = require("telescope.pickers")
-local themes = require("telescope.themes")
-local finders = require("telescope.finders")
-local actions = require("telescope.actions")
-local action_state = require("telescope.actions.state")
-local action_utils = require("telescope.actions.utils")
-
-local function generate_new_finder(harpoon_files)
-    local files = {}
-    for i, item in ipairs(harpoon_files.items) do
-        table.insert(files, i .. ". " .. item.value)
-    end
-
-    return finders.new_table({
-        results = files,
-    })
-end
-
--- move_mark_up will move the mark up in the list, refresh the picker's result list and move the selection accordingly
-local function move_mark_up(prompt_bufnr, harpoon_files)
-    local selection = action_state.get_selected_entry()
-    if not selection then
-        return
-    end
-    if selection.index == 1 then
-        return
-    end
-
-    local mark = harpoon_files.items[selection.index]
-
-    table.remove(harpoon_files.items, selection.index)
-    table.insert(harpoon_files.items, selection.index - 1, mark)
-
-    local current_picker = action_state.get_current_picker(prompt_bufnr)
-    current_picker:refresh(generate_new_finder(harpoon_files), {})
-
-    -- yes defer_fn is an awful solution. If you find a better one, please let the world know.
-    -- it's used here because we need to wait for the picker to refresh before we can set the selection
-    -- actions.move_selection_previous() doesn't work here because the selection gets reset to 0 on every refresh.
-    vim.defer_fn(function()
-        -- don't even bother finding out why this is -2 here. (i don't know either)
-        current_picker:set_selection(selection.index - 2)
-    end, 2) -- 2ms was the minimum delay I could find that worked without glitching out the picker
-end
-
--- move_mark_down will move the mark down in the list, refresh the picker's result list and move the selection accordingly
-local function move_mark_down(prompt_bufnr, harpoon_files)
-    local selection = action_state.get_selected_entry()
-    if not selection then
-        return
-    end
-
-    local length = harpoon:list():length()
-    if selection.index == length then
-        return
-    end
-
-    local mark = harpoon_files.items[selection.index]
-
-    table.remove(harpoon_files.items, selection.index)
-    table.insert(harpoon_files.items, selection.index + 1, mark)
-
-    local current_picker = action_state.get_current_picker(prompt_bufnr)
-    current_picker:refresh(generate_new_finder(harpoon_files), {})
-
-    -- yes defer_fn is an awful solution. If you find a better one, please let the world know.
-    -- it's used here because we need to wait for the picker to refresh before we can set the selection
-    -- actions.move_selection_next() doesn't work here because the selection gets reset to 0 on every refresh.
-    vim.defer_fn(function()
-        current_picker:set_selection(selection.index)
-    end, 2) -- 2ms was the minimum delay I could find that worked without glitching out the picker
-end
+        local state = require("telescope.actions.state")
 
 local function toggle_telescope(harpoon_files)
-    local file_paths = {}
-    for _, item in ipairs(harpoon_files.items) do
-        table.insert(file_paths, item.value)
-    end
-
     local finder = function()
-        local paths = {}
+        local file_paths = {}
         for _, item in ipairs(harpoon_files.items) do
-            table.insert(paths, item.value)
+            table.insert(file_paths, item.value)
         end
 
         return require("telescope.finders").new_table({
-            results = paths,
+            results = file_paths,
         })
     end
+
+    local delete_selected = function(prompt_bufnr)
+        local selected_entry = state.get_selected_entry()
+        local current_picker = state.get_current_picker(prompt_bufnr)
+
+        table.remove(harpoon_files.items, selected_entry.index)
+        current_picker:refresh(finder())
+    end
+
+    local move_selected_down = function(prompt_bufnr)
+        local selected_entry = state.get_selected_entry()
+        local current_picker = state.get_current_picker(prompt_bufnr)
+
+        if not selected_entry then
+            return
+        end
+        -- entries in picker are indexed in reverse order, so 1 is at the bottom
+        if selected_entry.index == 1 then
+            return
+        end
+
+        local mark = harpoon_files.items[selected_entry.index]
+        table.insert(harpoon_files.items, selected_entry.index - 1, mark)
+        table.remove(harpoon_files.items, selected_entry.index + 1)
+
+        current_picker:refresh(finder())
+
+        -- The other option is to modify telescope's table independently
+        -- of harpoon_list. This has the remote chance of desyncing the 
+        -- tow lists, and therefore not the greatest idea. Ideally,
+        -- telescope refresh should provide the on_complete callback 
+        -- as an option for refresh.
+        vim.defer_fn(function()
+            current_picker:set_selection(current_picker:get_selection_row() - (selected_entry.index - 2))
+        end, 2)
+    end
+
+    local move_selected_up = function(prompt_bufnr)
+        local selected_entry = state.get_selected_entry()
+        local current_picker = state.get_current_picker(prompt_bufnr)
+        local length = harpoon_files:length()
+
+        if not selected_entry then
+            return
+        end
+        -- entries in picker are indexed in reverse order, so 1 is at the bottom
+        if selected_entry.index == length then
+            return
+        end
+
+        local mark = harpoon_files.items[selected_entry.index]
+        table.insert(harpoon_files.items, selected_entry.index + 2, mark)
+        table.remove(harpoon_files.items, selected_entry.index)
+
+        current_picker:refresh(finder())
+        vim.defer_fn(function()
+            current_picker:set_selection(current_picker:get_selection_row() - (selected_entry.index))
+        end, 2)
+    end
+
 
     require("telescope.pickers").new({}, {
         prompt_title = "Harpoon",
@@ -132,44 +102,13 @@ local function toggle_telescope(harpoon_files)
         previewer = conf.file_previewer({}),
         sorter = conf.generic_sorter({}),
         attach_mappings = function(_, map)
-            -- Delete entries in insert mode from harpoon list with <C-d>
-            -- Change the keybinding to your liking
-            map({ 'n', 'i' }, '<C-d>', function(prompt_bufnr)
-                local state = require("telescope.actions.state")
-                local selected_entry = state.get_selected_entry()
-                local current_picker = state.get_current_picker(prompt_bufnr)
-
-                table.remove(harpoon_files.items, selected_entry.index)
-                current_picker:refresh(finder())
-
-                -- local curr_picker = action_state.get_current_picker(prompt_bufnr)
-
-                -- curr_picker:delete_selection(function(selection)
-                --     harpoon:list():removeAt(selection.index)
-                -- end,
-                -- { desc = "Delete entry from harpoon list" })
-            end)
-            -- Move entries up and down with <C-j> and <C-k>
-            -- Change the keybinding to your liking
-            map({ 'n', 'i' },
-                '<C-j>',
-                function(prompt_bufnr)
-                    move_mark_down(prompt_bufnr, harpoon_files)
-                end,
-                { desc = "Move entry down in harpoon list" }
-            )
-            map({ 'n', 'i' },
-                '<C-k>',
-                function(prompt_bufnr)
-                    move_mark_up(prompt_bufnr, harpoon_files)
-                end,
-                { desc = "Move entry up in harpoon list" }
-            )
-
+            map({ 'n', 'i' }, "<C-d>", delete_selected, { desc = "Delete entry from harpoon list" })
+            map({ 'n', 'i' }, "<C-j>", move_selected_down, { desc = "Move entry down in harpoon list" })
+            map({ 'n', 'i' }, "<C-k>", move_selected_up, { desc = "Move entry up in harpoon list" })
             return true
         end,
     }):find()
 end
-
 vim.keymap.set("n", "<C-e>", function() toggle_telescope(harpoon:list()) end,
     { desc = "Open harpoon window" })
+
