@@ -9,6 +9,8 @@ mason_lspconfig.setup {
 	ensure_installed = {
 		-- "ts_ls",
 		"eslint",
+        "cssls",
+        "jsonls",
 		"lua_ls",
 		-- "rust_analyzer",
 		"gopls",

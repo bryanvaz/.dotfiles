@@ -31,114 +31,119 @@ end
 
 read_keys_into_env()
 
+local function openai_thinking_providers(model_names)
+    local result = {}
+    for _, model_name in ipairs(model_names) do
+        local key = "openai/" .. model_name
+        local tools_key = "openai/" .. model_name .. "/tools"
+        result[key] = {
+            __inherited_from = 'openai',
+            model = model_name,
+            display_name = key,
+            timeout = 120000,
+            disable_tools = true,
+            extra_request_body = {
+                temperature = 0,
+                max_completion_tokens = 100000,
+                reasoning_effort = "high",
+            },
+        }
+        result[tools_key] = vim.tbl_extend("force", result[key],
+            {
+                display_name = tools_key,
+                disable_tools = false,
+            })
+    end
+    return result
+end
+
+local function copilot_thinking_providers(model_names)
+    local result = {}
+    for _, model_name in ipairs(model_names) do
+        local key = "copilot/" .. model_name
+        local tools_key = "copilot/" .. model_name .. "/tools"
+        result[key] = {
+            __inherited_from = 'copilot',
+            model = model_name,
+            display_name = key,
+            timeout = 120000,
+            disable_tools = true,
+            extra_request_body = {
+                temperature = 0,
+                max_tokens = 65536,
+            },
+        }
+        result[tools_key] = vim.tbl_extend("force", result[key],
+            {
+                display_name = tools_key,
+                disable_tools = false,
+            })
+    end
+    return result
+end
+
+local function claude_thinking_providers(model_names)
+    local result = {}
+    for _, model_name in ipairs(model_names) do
+        local key = "claude/" .. model_name
+        local tools_key = "claude/" .. model_name .. "/tools"
+        result[key] = {
+            __inherited_from = 'claude',
+            model = model_name,
+            display_name = key,
+            timeout = 120000,
+            disable_tools = true,
+            extra_request_body = {
+                temperature = 0,
+                max_tokens = 64000,
+            },
+        }
+        result[tools_key] = vim.tbl_extend("force", result[key],
+            {
+                display_name = tools_key,
+                disable_tools = false,
+            })
+    end
+    return result
+end
+
+local Vertex = require("avante.providers.vertex")
+
+
 require("avante").setup({
-      ---@alias Provider "claude" | "openai" | "azure" | "gemini" | "cohere" | "copilot" | string
+  debug = false,
+  ---@alias avante.Mode "agentic" | "legacy"
+  mode = "legacy",
+  ---@alias avante.ProviderName "claude" | "openai" | "azure" | "gemini" | "vertex" | "cohere" | "copilot" | "bedrock" | "ollama" | string
   provider = "copilot", -- The provider used in Aider mode or in the planning phase of Cursor Planning Mode
-  -- WARNING: Since auto-suggestions are a high-frequency operation and therefore expensive,
-  -- currently designating it as `copilot` provider is dangerous because: https://github.com/yetone/avante.nvim/issues/1048
-  -- Of course, you can reduce the request frequency by increasing `suggestion.debounce`.
-  auto_suggestions_provider = false,
+  auto_suggestions_provider = nil,
   cursor_applying_provider = "groq", -- The provider used in the applying phase of Cursor Planning Mode, defaults to nil, when nil uses Config.provider as the provider for the applying phase
-  openai = {
-    endpoint = "https://api.openai.com/v1",
-    model = "gpt-4o",
-    timeout = 30000, -- Timeout in milliseconds
-    temperature = 0,
-    max_tokens = 16384,
-    -- reasoning_effort = "high" -- only supported for reasoning models (o1, etc.)
-  },
-  copilot = {
-    endpoint = "https://api.githubcopilot.com",
-    model = "claude-3.7-sonnet",
-    proxy = nil, -- [protocol://]host[:port] Use this proxy
-    allow_insecure = false, -- Allow insecure server connections
-    timeout = 30000, -- Timeout in milliseconds
-    temperature = 0,
-    max_tokens = 8192,
-  },
-  claude = {
-    endpoint = "https://api.anthropic.com",
-    model = "claude-3-7-sonnet-20250219",
-    temperature = 0,
-    max_tokens = 8192,
-  },
-    ---To add support for custom provider, follow the format below
-  ---See https://github.com/yetone/avante.nvim/wiki#custom-providers for more details
-  vendors = {
-    groq = { -- define groq provider
-        __inherited_from = 'openai',
-        api_key_name = 'GROQ_API_KEY',
-        endpoint = 'https://api.groq.com/openai/v1/',
-        model = 'llama-3.3-70b-versatile',
-        max_tokens = 32768, -- remember to increase this value, otherwise it will stop generating halfway
+  disabled_tools = { "python", "replace_in_file" },
+  providers = vim.tbl_extend("force",{},
+    ----------------------------------------
+    --               Groq                 --
+    ----------------------------------------
+    {
+        groq = { -- define groq provider
+            __inherited_from = 'openai',
+            api_key_name = 'GROQ_API_KEY',
+            endpoint = 'https://api.groq.com/openai/v1/',
+            model = 'llama-3.3-70b-versatile',
+            max_tokens = 32768, -- remember to increase this value, otherwise it will stop generating halfway
+        },
+        [ "groq-deepseek" ] = { -- define groq provider
+            __inherited_from = 'openai',
+            api_key_name = 'GROQ_API_KEY',
+            endpoint = 'https://api.groq.com/openai/v1/',
+            model = 'deepseek-r1-distill-llama-70b',
+            -- max_tokens = 32768, -- remember to increase this value, otherwise it will stop generating halfway
+        },
+
     },
-    [ "groq-deep" ] = { -- define groq provider
-        __inherited_from = 'openai',
-        api_key_name = 'GROQ_API_KEY',
-        endpoint = 'https://api.groq.com/openai/v1/',
-        model = 'deepseek-r1-distill-llama-70b',
-        -- max_tokens = 32768, -- remember to increase this value, otherwise it will stop generating halfway
-    },
-    ["copilot-4o"] = {
-      __inherited_from = 'copilot',
-      model = "gpt-4o",
-      allow_insecure = false, -- Allow insecure server connections
-      timeout = 30000, -- Timeout in milliseconds
-      temperature = 0,
-      max_tokens = 8192,
-    },
-    ["copilot-4o-16k"] = {
-      __inherited_from = 'copilot',
-      model = "gpt-4o",
-      allow_insecure = false, -- Allow insecure server connections
-      timeout = 30000, -- Timeout in milliseconds
-      temperature = 0,
-      max_tokens = 16384,
-    },
-    [ "copilot-o1" ] = {
-      __inherited_from = 'copilot',
-      model = "o1",
-      timeout = 30000, -- Timeout in milliseconds
-      temperature = 0,
-      -- max_tokens = 4096,
-      reasoning_effort = "high" -- only supported for reasoning models (o1, etc.)
-    },
-    [ "copilot-o3-mini" ] = {
-      __inherited_from = 'copilot',
-      model = "o3-mini",
-      timeout = 30000, -- Timeout in milliseconds
-      temperature = 0,
-      -- max_tokens = 4096,
-      reasoning_effort = "high" -- only supported for reasoning models (o1, etc.)
-    },
-    [ "openai-o1" ] = {
-      __inherited_from = 'openai',
-      model = "o1",
-      allow_insecure = false, -- Allow insecure server connections
-      timeout = 30000, -- Timeout in milliseconds
-      temperature = 0,
-      max_tokens = 100000,
-      reasoning_effort = "high" -- only supported for reasoning models (o1, etc.)
-    },
-    [ "openai-o3-mini" ] = {
-      __inherited_from = 'openai',
-      model = "o3-mini",
-      allow_insecure = false, -- Allow insecure server connections
-      timeout = 30000, -- Timeout in milliseconds
-      temperature = 0,
-      max_tokens = 100000,
-      reasoning_effort = "high" -- only supported for reasoning models (o1, etc.)
-    },
-  },
-  ---Specify the special dual_boost mode
-  ---1. enabled: Whether to enable dual_boost mode. Default to false.
-  ---2. first_provider: The first provider to generate response. Default to "openai".
-  ---3. second_provider: The second provider to generate response. Default to "claude".
-  ---4. prompt: The prompt to generate response based on the two reference outputs.
-  ---5. timeout: Timeout in milliseconds. Default to 60000.
-  ---How it works:
-  --- When dual_boost is enabled, avante will generate two responses from the first_provider and second_provider respectively. Then use the response from the first_provider as provider1_output and the response from the second_provider as provider2_output. Finally, avante will generate a response based on the prompt and the two reference outputs, with the default Provider as normal.
-  ---Note: This is an experimental feature and may not work as expected.
+    openai_thinking_providers({"o1", "o3-mini", "o4-mini"}),
+    copilot_thinking_providers({"claude-sonnet-4", "claude-3.7-sonnet", "claude-3.7-thought", "gemini-2.5-pro", "gemini-2.5-flash-001", "o4-mini", "gpt-4.1"}),
+    claude_thinking_providers({"claude-opus-4-0", "claude-sonnet-4-0", "claude-3-7-sonnet-latest"})
+  ),
   dual_boost = {
     enabled = false,
     first_provider = "openai",
@@ -147,7 +152,9 @@ require("avante").setup({
     timeout = 60000, -- Timeout in milliseconds
   },
   behaviour = {
-    auto_suggestions = false, -- Experimental stage
+    auto_focus_sidebar = true,
+    auto_suggestions = false, -- vxperimental stage
+    auto_suggestions_respect_ignore = false,
     auto_set_highlight_group = true,
     auto_set_keymaps = true,
     auto_apply_diff_after_generation = false,
@@ -155,6 +162,17 @@ require("avante").setup({
     minimize_diff = true, -- Whether to remove unchanged lines when applying a code block
     enable_token_counting = true, -- Whether to enable token counting. Default to true.
     enable_cursor_planning_mode = true, -- Whether to enable Cursor Planning Mode. Default to false.
+    use_cwd_as_project_root = false,
+    auto_focus_on_diff_view = false,
+  },
+  history = {
+    max_tokens = 8096,
+    carried_entry_count = nil,
+    storage_path = vim.fn.stdpath("state") .. "/avante",
+    paste = {
+      extension = "png",
+      filename = "pasted-%Y-%m-%d-%H-%M-%S",
+    },
   },
   mappings = {
     --- @class AvanteConflictMappings
@@ -186,6 +204,8 @@ require("avante").setup({
       apply_cursor = "a",
       switch_windows = "<Tab>",
       reverse_switch_windows = "<S-Tab>",
+      close = { "q" },
+      close_from_input = { normal = nil, insert = nil },
     },
   },
   hints = { enabled = true },
@@ -209,7 +229,7 @@ require("avante").setup({
     },
     ask = {
       floating = false, -- Open the 'AvanteAsk' prompt in a floating window
-      start_insert = true, -- Start insert mode when opening the ask window
+      start_insert = false, -- Start insert mode when opening the ask window
       border = "rounded",
       ---@type "ours" | "theirs"
       focus_on_apply = "ours", -- which diff to focus after applying
@@ -237,4 +257,6 @@ require("avante").setup({
     throttle = 600,
   },
 })
+
+Vertex.api_key_name = ""
 

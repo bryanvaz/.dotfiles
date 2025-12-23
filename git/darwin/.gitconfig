@@ -1,9 +1,9 @@
 [user]
-	email = bryan@vaz.dev
+	email = bryan.git@vaz.dev
 	name = Bryan Vaz
-	signingkey = A14A627F46060F2BACC6F4D22AFD3F2E2195CA02
+	signingkey = B869620CAF5FE4493195EBB5710E55C3815AD974
 [core]
-	editor = nvim
+	editor = /usr/local/bin/nvim
 	excludesfile = /Users/bryan/.gitignore_global
 [difftool "sourcetree"]
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"

@@ -71,6 +71,11 @@ bindkey "^[e" end-of-line
 # Aliases and other shortucts
 ###################################
 
+# add fzf search history if present
+if [ "$(command -v fzf)" ]; then
+  bindkey '^r' fzf-history-widget
+fi
+
 if ! type "which nvim" > /dev/null; then
   alias vim=nvim
 fi

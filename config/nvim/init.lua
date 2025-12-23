@@ -34,6 +34,9 @@ Much of the configuration of individual plugins you can find in either:
 -- leader.
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
+
+
+
 require "bryan.remap"
 require "bryan.options"
 
@@ -41,3 +44,45 @@ require "bryan.options"
 -- require "tj.disable_builtin"
 
 require "bryan.lazy"
+
+-- Store the last processed message count
+vim.g.last_message_idx = 0
+
+function LogNewMessages()
+  local log_dir = vim.fn.expand('~/.local/state/nvim')
+  local log_file = log_dir .. '/messages.log'
+  
+  -- Ensure the directory exists
+  if vim.fn.isdirectory(log_dir) == 0 then
+    vim.fn.mkdir(log_dir, 'p')
+  end
+  
+  -- Get all messages
+  local all_msgs = vim.fn.execute('messages')
+  local all_lines = vim.fn.split(all_msgs, '\n')
+  
+  -- Check if there are new messages
+  if #all_lines > vim.g.last_message_idx then
+    -- Extract only the new messages
+    local new_msgs = {}
+    for i = vim.g.last_message_idx + 1, #all_lines do
+      table.insert(new_msgs, all_lines[i])
+    end
+    
+    -- Add timestamp and write to log file
+    if #new_msgs > 0 then
+      local timestamp = os.date('%Y-%m-%d %H:%M:%S')
+      table.insert(new_msgs, 1, '--- ' .. timestamp .. ' ---')
+      vim.fn.writefile(new_msgs, log_file, 'a')
+    end
+    
+    -- Update the last message index
+    vim.g.last_message_idx = #all_lines
+  end
+end
+
+    -- Enable to log to file
+-- vim.api.nvim_create_autocmd({"VimLeave", "CursorHold"}, {
+--   callback = LogNewMessages
+-- })
+

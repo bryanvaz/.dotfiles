@@ -160,35 +160,50 @@ return {
     {
       "yetone/avante.nvim",
       event = "VeryLazy",
-      lazy = true,
-      version = "*", -- Set this to "*" to always pull the latest release version, or set it to false to update to the latest code changes.
+      -- lazy = true,
+      -- version = "*", -- Set this to "*" to always pull the latest release version, or set it to false to update to the latest code changes.
+      -- version = false, -- Set this to "*" to always pull the latest release version, or set it to false to update to the latest code changes.
+      -- commit = "f9aa754", -- Peg to brefore hiding chat result
+      -- commit = "697384f", -- Latest Working
+      commit = "2dd4c04", -- Latest on main
       opts = {
         provider = "copilot",
-        copilot = {
-          model = "claude-3.7-sonnet",
+        mode = "legacy",
+        debug = false,
+        providers = {
+          copilot = {
+              endpoint = "https://api.githubcopilot.com",
+              model = "claude-3.7-sonnet",
+              disable_tools = true,
+              display_name = "copilot/claude-3.7-sonnet/default",
+          },
+          openai = {
+            endpoint = "https://api.openai.com/v1",
+            model = "gpt-4.1",
+            display_name = "openai/do_not_use",
+            timeout = 30000,
+            disable_tools = true,
+            extra_request_body = {
+              temperature = 0,
+              -- max_completion_tokens = 8192,
+              -- reasoning_effort = "medium",
+            },
+          },
+          claude = {
+            endpoint = "https://api.anthropic.com",
+            model = "claude-sonnet-4-20250514",
+            display_name = "claude/do_not_use",
+            timeout = 120000, -- Timeout in milliseconds
+            disable_tools = true,
+            extra_request_body = {
+              temperature = 0,
+              max_tokens = 64000,
+            },
+          },
+          -- openai = nil,
         },
-        openai = {
-          endpoint = "https://api.openai.com/v1",
-          model = "gpt-4o",
-        },
-        claude = {
-          model = "claude-3-7-sonnet-20250219",
-        },
-        -- add any opts here
-        -- for example
-        -- provider = "openai",
-        -- openai = {
-        --   endpoint = "https://api.openai.com/v1",
-        --   model = "gpt-4o", -- your desired model (or use gpt-4o, etc.)
-        --   timeout = 30000, -- timeout in milliseconds
-        --   temperature = 0, -- adjust if needed
-        --   max_tokens = 4096,
-          -- reasoning_effort = "high" -- only supported for reasoning models (o1, etc.)
-        -- },
       },
-      -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
       build = "make",
-      -- build = "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false" -- for windows
       dependencies = {
         "nvim-treesitter/nvim-treesitter",
         "stevearc/dressing.nvim",
